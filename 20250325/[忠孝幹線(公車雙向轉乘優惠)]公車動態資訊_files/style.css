@@ -1,0 +1,119 @@
+body,td,th {
+	font-size: 12px;
+}
+
+th {
+	font-size: 12px;
+}
+
+select {
+	font-size: 16px;
+}
+
+.menuitem1 {
+	font-size: 16px;
+	color: darkblue;
+	background-color: lightblue;
+}
+
+.msg {
+	font-size: 15px;
+	color: dark;
+	background-color:#FFF380;
+}
+
+.menuitem2 {
+	font-size: 16px;
+	color: darkblue;
+	background-color: lightgreen;
+}
+
+.formattable1 {
+border:0px;
+width:100%;
+}
+
+.title1 {
+	font-size: 16px;
+	color: yellow;
+	background-color: blue;
+}
+
+.title2 {
+	font-size: 16px;
+	color: darkblue;
+	background-color: lightblue;
+}
+
+.title3 {
+	font-size: 16px;
+	color: darkblue;
+	background-color: lightgreen;
+}
+
+.title4 {
+	font-size: 14px;
+	color: yellow;
+	background-color: green;
+}
+
+.ttegotitle {
+background-color:blue;
+color:yellow;
+text-align: center;
+}
+
+.ttebacktitle {
+background-color:green;
+color:yellow;
+text-align: center;
+}
+
+.ttego1 {
+background-color:#A9F5F2;
+}
+
+.ttego2 {
+background-color:#01DFD7;
+}
+
+.tteback1 {
+background-color:#D0F5A9;
+}
+
+.tteback2 {
+background-color:lightgreen;
+}
+
+.ttestop {
+background-color:#01DFD7;
+color: darkblue;
+font-size: 42px;
+font-family:標楷體;
+}
+
+.transitsrc {
+background-color:lightgreen;
+}
+
+.transitdest {
+background-color:lightblue;
+}
+
+.transit1 {
+background-color:lightblue;
+}
+
+.transit2 {
+background-color:lightgreen;
+}
+
+.updatetime {
+	font-size: 14px;
+}
+
+.marqueetd {
+	font-size: 16px;
+	color: darkblue;
+	background-color: lightgreen;
+}
