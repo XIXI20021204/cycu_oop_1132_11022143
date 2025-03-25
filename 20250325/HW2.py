@@ -10,13 +10,13 @@ df['資料日期'] = pd.to_datetime(df['資料日期'], format='%Y%m%d')
 
 # 選取需要的資料
 dates = df['資料日期']
-cash_1 = df['現金.買']
-cash_2 = df['現金.賣']
+cash_1 = df['BUY']
+cash_2 = df['SELL']
 
 # 繪製折線圖
 plt.figure(figsize=(10, 5))
-plt.plot(dates, cash_1, label='現金.買', marker='o')
-plt.plot(dates, cash_2, label='現金.賣', marker='o')
+plt.plot(dates, cash_1, label='BUY', marker='o')
+plt.plot(dates, cash_2, label='SELL', marker='o')
 
 # 設定圖表標題和標籤
 plt.title('現金匯率折線圖')
