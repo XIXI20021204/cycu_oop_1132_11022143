@@ -29,10 +29,7 @@ if response.status_code == 200:
         # 建立車站名稱與索引的對應 (用於演示)
         station_times = {station: f"{i+1}分鐘" for i, station in enumerate(stations)}
         
-        # 顯示前5個車站確認
-        print("前5個車站範例:")
-        for station in list(station_times.keys())[:5]:
-            print(f"- {station}")
+        
 
         # 用戶查詢
         search = input("請輸入車站名稱：").strip()
