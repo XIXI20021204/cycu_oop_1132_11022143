@@ -5,15 +5,18 @@ import matplotlib.pyplot as plt
 file_path = r'c:\Users\User\Documents\GitHub\cycu_oop_1132_11022143\20250325\gold.csv'
 df = pd.read_csv(file_path)
 
+# 將資料日期轉換為 datetime 格式
+df['資料日期'] = pd.to_datetime(df['資料日期'], format='%Y%m%d')
+
 # 選取需要的資料
 dates = df['資料日期']
-cash_buy = df['現金'].iloc[:, 0]  # 本行買入的現金
-cash_sell = df['現金'].iloc[:, 1]  # 本行賣出的現金
+cash_1 = df['現金.1']
+cash_2 = df['現金.2']
 
 # 繪製折線圖
 plt.figure(figsize=(10, 5))
-plt.plot(dates, cash_buy, label='本行買入現金', marker='o')
-plt.plot(dates, cash_sell, label='本行賣出現金', marker='o')
+plt.plot(dates, cash_1, label='現金.1', marker='o')
+plt.plot(dates, cash_2, label='現金.2', marker='o')
 
 # 設定圖表標題和標籤
 plt.title('現金匯率折線圖')
