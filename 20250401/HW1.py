@@ -3,6 +3,11 @@ import html
 import pandas as pd
 from bs4 import BeautifulSoup
 
+# 設定 Pandas 顯示所有列
+pd.set_option('display.max_rows', None)  # 顯示所有列
+pd.set_option('display.max_columns', None)  # 顯示所有欄位
+pd.set_option('display.width', 1000)  # 設定輸出寬度
+
 url = '''https://pda5284.gov.taipei/MQS/route.jsp?rid=10417'''
 
 # 發送 GET 請求
@@ -27,12 +32,11 @@ if response.status_code == 200:
     # 找到所有表格
     tables = soup.find_all("table")
 
-    # 初始化 DataFrame 列表
-    dataframes = []
+    # 初始化資料列表
+    all_rows = []
 
     # 遍歷表格
     for table in tables:
-        rows = []
         # 找到所有符合條件的 tr 標籤
         for tr in table.find_all("tr", class_=["ttego1", "ttego2"]):
             # 提取站點名稱和連結
@@ -40,20 +44,23 @@ if response.status_code == 200:
             if td:
                 stop_name = html.unescape(td.text.strip())  # 解碼站點名稱
                 stop_link = td.find("a")["href"] if td.find("a") else None
-                rows.append({"站點名稱": stop_name, "連結": stop_link})
-        # 如果有資料，轉換為 DataFrame
-        if rows:
-            df = pd.DataFrame(rows)
-            dataframes.append(df)
+                # 根據 class 區分去程與回程
+                if "ttego1" in tr["class"]:
+                    stop_type = "去程站點名稱"
+                elif "ttego2" in tr["class"]:
+                    stop_type = "回程站點名稱"
+                else:
+                    stop_type = "未知"
+                all_rows.append({"類型": stop_type, "站點名稱": stop_name, "連結": stop_link})
 
-    # 將兩個 DataFrame 分別命名
-    if len(dataframes) >= 2:
-        df1, df2 = dataframes[0], dataframes[1]
-        print("第一個 DataFrame:")
-        print(df1)
-        print("\n第二個 DataFrame:")
-        print(df2)
-    else:
-        print("未找到足夠的表格資料。")
+    # 將資料分成兩個 DataFrame
+    df_go = pd.DataFrame([row for row in all_rows if row["類型"] == "去程站點名稱"])
+    df_return = pd.DataFrame([row for row in all_rows if row["類型"] == "回程站點名稱"])
+
+    # 輸出結果
+    print("去程 DataFrame:")
+    print(df_go)
+    print("\n回程 DataFrame:")
+    print(df_return)
 else:
     print(f"無法下載網頁，HTTP 狀態碼: {response.status_code}")
