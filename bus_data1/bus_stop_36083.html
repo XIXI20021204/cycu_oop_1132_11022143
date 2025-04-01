@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+        <script src="ajax2.js"></script>
+		<title>[交通部觀光署]公車動態資訊</title>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
+		<link rel="shortcut icon" href="#">
+		<script language="JavaScript">
+			var TTEMap = {'0':'進站中','':'未發車','-1':'未發車','-2':'交管不停','-3':'末班已過','-4':'今日未營運'};
+			var Timer = null;
+		    var divIndex=0;
+
+	    	function switchDiv() {
+	    		if (document.getElementById("SDIV"+divIndex))
+	    			{
+	    			if (document.getElementById("IgnoreCheck"+divIndex))
+	    				if (document.getElementById("IgnoreCheck"+divIndex).checked)
+	    					localStorage.setItem("PDANewsAlertIgnoew"+document.getElementById("IgnoreCheck"+divIndex).value, "Yes");
+	    			document.getElementById("SDIV"+divIndex).style.display='none';
+	    			};
+	    		divIndex++;
+	    		while (document.getElementById("IgnoreCheck"+divIndex) 
+	    				&& localStorage.getItem("PDANewsAlertIgnoew"+document.getElementById("IgnoreCheck"+divIndex).value)=="Yes")
+	    		{divIndex++;};
+	    		
+	    		if (document.getElementById("SDIV"+divIndex))
+	    			document.getElementById("SDIV"+divIndex).style.display='';
+	    	}
+			
+	        function queryDyna() {
+	        	if (Timer!=null) clearTimeout(Timer);
+	        	http('GET', 'StopLocationDyna?stoplocationid=3930', processDyna);
+	        }
+	        
+	    	function processDyna(data) {
+				if (data.UpdateTime)
+					{
+					document.getElementById("spnUpdateTime").innerHTML= data.UpdateTime.substring(11);
+					
+					for (var i=0;i<data.Stop.length;i++)
+						{
+						if (data.Stop[i].n1==null) continue;
+						var arrN1 = data.Stop[i].n1.split(',');
+						var tteTD = document.getElementById("tte"+arrN1[1]);
+						var tteHTML="";
+						
+						if (tteTD)
+						   {
+								if (TTEMap.hasOwnProperty(arrN1[7]))
+									tteHTML= TTEMap[arrN1[7]];
+								else
+										{
+							 			var tte=parseInt(arrN1[7],10);
+							 			if (tte>0 && tte<180)
+							 				tteHTML= "將到站";
+							 			else
+							 				tteHTML= Math.floor(tte/60)+"分";
+										};
+								
+								if (tteTD.getAttribute("data-deptimen1")=="Y")
+									{
+									
+											if (arrN1[3].indexOf("&#x3a;")>-1) if (arrN1[7]=="-1" || parseInt(arrN1[7],10)>5940) tteHTML=arrN1[3]+" 發車"; 
+									
+									};
+										
+								tteTD.innerHTML=tteHTML;
+						   };
+						};
+					};
+				Timer=setTimeout(queryDyna,60000);
+	    	}
+		</script>
+	</head>
+	<body onload="switchDiv();queryDyna();">
+		<center>
+		<div id="SDIV1" style="">
+
+		<table class="formattable1">
+    	
+        	<tbody><tr>
+	            <th class="title1"><a href="index.jsp" class="title1">行動查詢系統</a></th>
+        	</tr>
+    	
+			<tr>
+				<th class="title2"><a href="routelist.jsp" class="title2">查詢公車動態資訊</a></th>
+			</tr>
+			<tr>
+				<th class="title4">交通部觀光署<br><span class="updatetime">(更新時間：<span id="spnUpdateTime"></span>&nbsp;<input type="button" value="立刻更新" onclick="queryDyna();">)</span></th>
+			</tr>
+		</tbody></table>
+    	
+			<marquee scrollamount="4" class="marqueetd" width="100%">2025雙北世壯運在臺北，5/17-5/30一起為選手加油!</marquee>
+    	
+		<table class="formattable1">
+			<tbody><tr>
+				<td width="100%" valign="top">
+				    <table border="0" width="100%">
+				      <tbody><tr>
+                        <th class="ttegotitle">路線</th>
+                        <th class="ttegotitle">站牌</th>
+                        <th class="ttegotitle">去返程</th>
+                        <th class="ttegotitle">預估到站</th>
+                      </tr>
+                      <tr class="ttego1"><td><a href="route.jsp?rid=18010">1579 基隆市中正區→臺北市區</a></td><td><a href="stop.jsp?from=sl&amp;sid=200131">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte200131" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=18012">1579A 基隆市中正區→臺北市區(經中正路)</a></td><td><a href="stop.jsp?from=sl&amp;sid=200179">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte200179" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17155">1800 基隆→中崙</a></td><td><a href="stop.jsp?from=sl&amp;sid=165909">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte165909" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17166">1813A 基隆→臺北[百福社區]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166226">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166226" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17167">1813B 基隆→臺北[東信路]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166240">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166240" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17168">1813C 基隆→臺北[八斗子]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166255">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166255" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17169">1813D 基隆[經中山區]→臺北</a></td><td><a href="stop.jsp?from=sl&amp;sid=166271">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166271" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17170">1813E 基隆→臺北[大武崙]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166296">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166296" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17171">1813F 基隆→臺北[暖暖]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166313">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166313" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17172">1813G 基隆→臺北[新豐里]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166332">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166332" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17174">1813H 基隆→臺北[國家新城]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166349">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166349" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17177">1815 金山青年活動中心→臺北</a></td><td><a href="stop.jsp?from=sl&amp;sid=166461">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166461" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17179">1815A 金山青年活動中心→臺北[法鼓山]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166569">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166569" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17182">1815C 金山青年活動中心→臺北[經基金交流道]</a></td><td><a href="stop.jsp?from=sl&amp;sid=166718">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte166718" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17495">1815D 金山青年活動中心→臺北[萬里至臺北]</a></td><td><a href="stop.jsp?from=sl&amp;sid=177394">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte177394" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=11212">204</a></td><td><a href="stop.jsp?from=sl&amp;sid=18206">交通部觀光署</a></td><td align="center">返程</td><td align="center" id="tte18206" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=10912">212</a></td><td><a href="stop.jsp?from=sl&amp;sid=10642">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte10642" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=16132">212夜</a></td><td><a href="stop.jsp?from=sl&amp;sid=125326">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte125326" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=10911">212直</a></td><td><a href="stop.jsp?from=sl&amp;sid=10774">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte10774" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=10419">232快</a></td><td><a href="stop.jsp?from=sl&amp;sid=36171">交通部觀光署</a></td><td align="center">返程</td><td align="center" id="tte36171" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=10752">278</a></td><td><a href="stop.jsp?from=sl&amp;sid=22339">交通部觀光署</a></td><td align="center">返程</td><td align="center" id="tte22339" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=16439">278區</a></td><td><a href="stop.jsp?from=sl&amp;sid=125269">交通部觀光署</a></td><td align="center">返程</td><td align="center" id="tte125269" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=11411">299</a></td><td><a href="stop.jsp?from=sl&amp;sid=10222">交通部觀光署</a></td><td align="center">返程</td><td align="center" id="tte10222" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=15571">600</a></td><td><a href="stop.jsp?from=sl&amp;sid=45550">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte45550" data-deptimen1="Y"></td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=16633">919</a></td><td><a href="stop.jsp?from=sl&amp;sid=163245">交通部觀光署</a></td><td align="center">去程</td><td align="center" id="tte163245" data-deptimen1="Y"></td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=10417">忠孝幹線</a></td><td><a href="stop.jsp?from=sl&amp;sid=36083">交通部觀光署</a></td><td align="center">返程</td><td align="center" id="tte36083" data-deptimen1="Y"></td></tr>
+
+                    </tbody></table>
+				</td>
+			</tr>
+		</tbody></table>
+		</div>
+
+	
+</center><div id="JSMX_loading"></div></body></html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+        <script src="ajax2.js"></script>
+		<title>[民和公寓]公車動態資訊</title>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
+		<link rel="shortcut icon" href="#">
+		<script language="JavaScript">
+			var TTEMap = {'0':'進站中','':'未發車','-1':'未發車','-2':'交管不停','-3':'末班已過','-4':'今日未營運'};
+			var Timer = null;
+		    var divIndex=0;
+
+	    	function switchDiv() {
+	    		if (document.getElementById("SDIV"+divIndex))
+	    			{
+	    			if (document.getElementById("IgnoreCheck"+divIndex))
+	    				if (document.getElementById("IgnoreCheck"+divIndex).checked)
+	    					localStorage.setItem("PDANewsAlertIgnoew"+document.getElementById("IgnoreCheck"+divIndex).value, "Yes");
+	    			document.getElementById("SDIV"+divIndex).style.display='none';
+	    			};
+	    		divIndex++;
+	    		while (document.getElementById("IgnoreCheck"+divIndex) 
+	    				&& localStorage.getItem("PDANewsAlertIgnoew"+document.getElementById("IgnoreCheck"+divIndex).value)=="Yes")
+	    		{divIndex++;};
+	    		
+	    		if (document.getElementById("SDIV"+divIndex))
+	    			document.getElementById("SDIV"+divIndex).style.display='';
+	    	}
+			
+	        function queryDyna() {
+	        	if (Timer!=null) clearTimeout(Timer);
+	        	http('GET', 'StopLocationDyna?stoplocationid=15087', processDyna);
+	        }
+	        
+	    	function processDyna(data) {
+				if (data.UpdateTime)
+					{
+					document.getElementById("spnUpdateTime").innerHTML= data.UpdateTime.substring(11);
+					
+					for (var i=0;i<data.Stop.length;i++)
+						{
+						if (data.Stop[i].n1==null) continue;
+						var arrN1 = data.Stop[i].n1.split(',');
+						var tteTD = document.getElementById("tte"+arrN1[1]);
+						var tteHTML="";
+						
+						if (tteTD)
+						   {
+								if (TTEMap.hasOwnProperty(arrN1[7]))
+									tteHTML= TTEMap[arrN1[7]];
+								else
+										{
+							 			var tte=parseInt(arrN1[7],10);
+							 			if (tte>0 && tte<180)
+							 				tteHTML= "將到站";
+							 			else
+							 				tteHTML= Math.floor(tte/60)+"分";
+										};
+								
+								if (tteTD.getAttribute("data-deptimen1")=="Y")
+									{
+									
+											if (arrN1[3].indexOf("&#x3a;")>-1) if (arrN1[7]=="-1" || parseInt(arrN1[7],10)>5940) tteHTML=arrN1[3]+" 發車"; 
+									
+									};
+										
+								tteTD.innerHTML=tteHTML;
+						   };
+						};
+					};
+				Timer=setTimeout(queryDyna,60000);
+	    	}
+		</script>
+	</head>
+	<body onload="switchDiv();queryDyna();">
+		<center>
+		<div id="SDIV1" style="">
+
+		<table class="formattable1">
+    	
+        	<tbody><tr>
+	            <th class="title1"><a href="index.jsp" class="title1">行動查詢系統</a></th>
+        	</tr>
+    	
+			<tr>
+				<th class="title2"><a href="routelist.jsp" class="title2">查詢公車動態資訊</a></th>
+			</tr>
+			<tr>
+				<th class="title4">民和公寓<br><span class="updatetime">(更新時間：<span id="spnUpdateTime">20:32:31</span>&nbsp;<input type="button" value="立刻更新" onclick="queryDyna();">)</span></th>
+			</tr>
+		</tbody></table>
+    	
+			<marquee scrollamount="4" class="marqueetd" width="100%">2025雙北世壯運在臺北，5/17-5/30一起為選手加油!</marquee>
+    	
+		<table class="formattable1">
+			<tbody><tr>
+				<td width="100%" valign="top">
+				    <table border="0" width="100%">
+				      <tbody><tr>
+                        <th class="ttegotitle">路線</th>
+                        <th class="ttegotitle">站牌</th>
+                        <th class="ttegotitle">去返程</th>
+                        <th class="ttegotitle">預估到站</th>
+                      </tr>
+                      <tr class="ttego1"><td><a href="route.jsp?rid=10415">221</a></td><td><a href="stop.jsp?from=sl&amp;sid=35879">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte35879" data-deptimen1="Y">12分</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=10443">225</a></td><td><a href="stop.jsp?from=sl&amp;sid=10136">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte10136" data-deptimen1="Y">將到站</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=16128">225區</a></td><td><a href="stop.jsp?from=sl&amp;sid=58288">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte58288" data-deptimen1="Y">末班已過</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=10416">232</a></td><td><a href="stop.jsp?from=sl&amp;sid=35994">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte35994" data-deptimen1="Y">8分</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=10419">232快</a></td><td><a href="stop.jsp?from=sl&amp;sid=36183">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte36183" data-deptimen1="Y">末班已過</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=10473">306</a></td><td><a href="stop.jsp?from=sl&amp;sid=36967">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte36967" data-deptimen1="Y">29分</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=10441">508</a></td><td><a href="stop.jsp?from=sl&amp;sid=36312">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte36312" data-deptimen1="Y">16分</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=10442">508區</a></td><td><a href="stop.jsp?from=sl&amp;sid=36434">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte36434" data-deptimen1="Y">將到站</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=16517">704</a></td><td><a href="stop.jsp?from=sl&amp;sid=131570">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte131570" data-deptimen1="Y">3分</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=16693">785</a></td><td><a href="stop.jsp?from=sl&amp;sid=150193">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte150193" data-deptimen1="Y">末班已過</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=16425">811</a></td><td><a href="stop.jsp?from=sl&amp;sid=123791">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte123791" data-deptimen1="Y">19分</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=16499">816</a></td><td><a href="stop.jsp?from=sl&amp;sid=129590">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte129590" data-deptimen1="Y">6分</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=16591">857</a></td><td><a href="stop.jsp?from=sl&amp;sid=139127">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte139127" data-deptimen1="Y">4分</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=16604">925</a></td><td><a href="stop.jsp?from=sl&amp;sid=148735">民和公寓</a></td><td align="center">去程</td><td align="center" id="tte148735" data-deptimen1="Y">17分</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=18766">925A</a></td><td><a href="stop.jsp?from=sl&amp;sid=209844">民和公寓</a></td><td align="center">去程</td><td align="center" id="tte209844" data-deptimen1="Y">末班已過</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17536">927</a></td><td><a href="stop.jsp?from=sl&amp;sid=179870">民和公寓</a></td><td align="center">去程</td><td align="center" id="tte179870" data-deptimen1="Y">未發車</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=17545">927經台北港</a></td><td><a href="stop.jsp?from=sl&amp;sid=180518">民和公寓</a></td><td align="center">去程</td><td align="center" id="tte180518" data-deptimen1="Y">末班已過</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17537">928</a></td><td><a href="stop.jsp?from=sl&amp;sid=179942">民和公寓</a></td><td align="center">去程</td><td align="center" id="tte179942" data-deptimen1="Y">23:00 發車</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=10417">忠孝幹線</a></td><td><a href="stop.jsp?from=sl&amp;sid=36114">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte36114" data-deptimen1="Y">38分</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=16668">橘13</a></td><td><a href="stop.jsp?from=sl&amp;sid=151110">民和公寓</a></td><td align="center">去程</td><td align="center" id="tte151110" data-deptimen1="Y">37分</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=16489">橘19</a></td><td><a href="stop.jsp?from=sl&amp;sid=129021">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte129021" data-deptimen1="Y">進站中</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=18268">橘19副</a></td><td><a href="stop.jsp?from=sl&amp;sid=205655">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte205655" data-deptimen1="Y">末班已過</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=10421">紅9</a></td><td><a href="stop.jsp?from=sl&amp;sid=10621">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte10621" data-deptimen1="Y">15分</td></tr>
+<tr class="ttego2"><td><a href="route.jsp?rid=17360">藍1</a></td><td><a href="stop.jsp?from=sl&amp;sid=171643">民和公寓</a></td><td align="center">返程</td><td align="center" id="tte171643" data-deptimen1="Y">13分</td></tr>
+<tr class="ttego1"><td><a href="route.jsp?rid=18039">通勤9</a></td><td><a href="stop.jsp?from=sl&amp;sid=201632">民和公寓</a></td><td align="center">去程</td><td align="center" id="tte201632" data-deptimen1="Y">末班已過</td></tr>
+
+                    </tbody></table>
+				</td>
+			</tr>
+		</tbody></table>
+		</div>
+
+	
+</center></body></html>

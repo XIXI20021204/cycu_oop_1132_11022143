@@ -44,6 +44,6 @@ def read_bus_stop_status(file_path, station_name):
 
 # 測試程式
 if __name__ == "__main__":
-    file_path = "bus_data1/bus_stop_36021.html"  # HTML 檔案路徑
+    file_path = "bus_data/bus_stop_36021.html"  # HTML 檔案路徑
     station_name = input("請輸入車站名稱: ")  # 輸入車站名稱
     read_bus_stop_status(file_path, station_name)
