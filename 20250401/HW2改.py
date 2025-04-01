@@ -8,7 +8,14 @@ from concurrent.futures import ThreadPoolExecutor
 # 設定 User-Agent 避免被封鎖
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
-def get_stop_info(stop_link: str):
+def create_route_folder(route_id: str):
+    """為指定公車路線創建資料夾"""
+    base_path = f"bus_data/{route_id}"
+    stations_path = f"{base_path}/stations"
+    os.makedirs(stations_path, exist_ok=True)  # 創建資料夾
+    return base_path, stations_path
+
+def get_stop_info(stop_link: str, route_id: str, stations_path: str):
     """下載並儲存指定站點的 HTML 頁面"""
     url = f'https://pda5284.gov.taipei/MQS/{stop_link}'
     
@@ -19,16 +26,18 @@ def get_stop_info(stop_link: str):
         # 讀取站點 ID
         stop_id = stop_link.split("=")[1]
 
-        with open(f"bus_stop_{stop_id}.html", "w", encoding="utf-8") as file:
+        file_path = f"{stations_path}/bus_stop_{stop_id}.html"
+        with open(file_path, "w", encoding="utf-8") as file:
             file.write(response.text)
 
-        print(f"✅ 下載完成：bus_stop_{stop_id}.html")
+        print(f"✅ 下載完成：{file_path}")
 
     except requests.exceptions.RequestException as e:
         print(f"❌ 下載失敗 {stop_link}: {e}")
 
 def get_bus_route(rid: str):
     """根據公車路線 ID 取得去程與回程的站點資訊，回傳 DataFrame"""
+    base_path, stations_path = create_route_folder(rid)
     url = f'https://pda5284.gov.taipei/MQS/route.jsp?rid={rid}'
 
     try:
@@ -36,7 +45,8 @@ def get_bus_route(rid: str):
         response.raise_for_status()
         
         # 儲存 HTML 檔案
-        with open(f"bus_route_{rid}.html", "w", encoding="utf-8") as file:
+        route_file = f"{base_path}/bus_route.html"
+        with open(route_file, "w", encoding="utf-8") as file:
             file.write(response.text)
 
         # 使用 BeautifulSoup 解析 HTML
@@ -71,29 +81,27 @@ def get_bus_route(rid: str):
         df_return = pd.DataFrame(return_stops)
 
         # 儲存 CSV 方便後續分析
-        df_go.to_csv(f"去程站點_{rid}.csv", index=False, encoding="utf-8")
-        df_return.to_csv(f"回程站點_{rid}.csv", index=False, encoding="utf-8")
+        df_go.to_csv(f"{base_path}/去程站點.csv", index=False, encoding="utf-8")
+        df_return.to_csv(f"{base_path}/回程站點.csv", index=False, encoding="utf-8")
 
-        return df_go, df_return
+        return df_go, df_return, base_path, stations_path
 
     except requests.exceptions.RequestException as e:
         raise ValueError(f"❌ 無法下載網頁: {e}")
 
-def download_all_stops(df: pd.DataFrame):
+def download_all_stops(df: pd.DataFrame, route_id: str, stations_path: str):
     """多線程下載所有站點的 HTML 頁面"""
-    os.makedirs("stations_html", exist_ok=True)
-
     with ThreadPoolExecutor(max_workers=5) as executor:
         for _, row in df.iterrows():
             if row["stop_link"]:
-                executor.submit(get_stop_info, row["stop_link"])
+                executor.submit(get_stop_info, row["stop_link"], route_id, stations_path)
 
 # 測試函數
 if __name__ == "__main__":
     rid = "10417"  # 測試公車路線 ID
 
     try:
-        df_go, df_return = get_bus_route(rid)
+        df_go, df_return, base_path, stations_path = get_bus_route(rid)
 
         print("\n🚏 去程站點 DataFrame:")
         print(df_go)
@@ -103,7 +111,9 @@ if __name__ == "__main__":
 
         # 下載所有站點的 HTML 頁面
         print("\n🚀 開始下載所有站點詳細資訊...")
-        download_all_stops(pd.concat([df_go, df_return]))
+        download_all_stops(pd.concat([df_go, df_return]), rid, stations_path)
+
+        print(f"\n✅ 所有資料已成功儲存至 {base_path}")
 
     except ValueError as e:
         print(f"Error: {e}")
