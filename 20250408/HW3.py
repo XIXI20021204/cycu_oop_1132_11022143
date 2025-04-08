@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
-import re
-from playwright.sync_api import sync_playwright
-import sqlite3
 import os
 import csv
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 
 class BusRouteInfo:
@@ -19,7 +17,7 @@ class BusRouteInfo:
         self.direction = direction
 
         self._fetch_content()
-        self._save_to_csv()
+        self._parse_and_save_to_csv()
 
     def _fetch_content(self):
         with sync_playwright() as p:
@@ -30,39 +28,67 @@ class BusRouteInfo:
             if self.direction == 'come':
                 page.click('a.stationlist-come-go-gray.stationlist-come')
             
-            page.wait_for_timeout(3000)  # wait for 3 seconds
+            # 等待站點資訊載入完成
+            page.wait_for_selector('.auto-list-stationlist', timeout=10000)  # 最多等待 10 秒
             self.content = page.content()
             browser.close()
 
-        # Write the rendered HTML to a file
-        os.makedirs("data", exist_ok=True)
+        # 儲存 HTML 內容到檔案（除錯用）
+        os.makedirs("data", exist_ok=True)  # 確保資料夾存在
         with open(f"data/ebus_taipei_{self.rid}.html", "w", encoding="utf-8") as file:
             file.write(self.content)
 
-    def _save_to_csv(self):
-        """
-        將抓取的 HTML 資料解析並存成 CSV 檔案
-        """
-        # 模擬解析資料 (這裡假設資料是站點名稱的列表，需根據實際 HTML 調整)
-        stops = re.findall(r'<div class="stop-name">([^<]+)</div>', self.content)
+    def _parse_and_save_to_csv(self):
+        # 使用 BeautifulSoup 解析 HTML
+        soup = BeautifulSoup(self.content, 'html.parser')
+        stops = []
 
-        if not stops:
-            print("無法解析站點資料，請檢查 HTML 結構")
+        # 根據提供的 HTML 結構，選擇站點資訊
+        stop_elements = soup.select('.auto-list-stationlist')  # 修改選擇器以符合實際網站結構
+        if not stop_elements:
+            print("無法找到站點資訊，請檢查選擇器或網站結構")
             return
 
-        # 將資料存成 CSV
-        csv_file = f"data/ebus_taipei_{self.rid}.csv"
-        with open(csv_file, mode="w", newline="", encoding="utf-8") as file:
-            writer = csv.writer(file)
-            writer.writerow(["Stop Name"])  # CSV 標題
-            for stop in stops:
-                writer.writerow([stop])
+        for stop in stop_elements:
+            try:
+                # 提取站點資訊
+                arrival_info = stop.select_one('.auto-list-stationlist-position-time').text.strip()  # 到達時間
+                stop_number = stop.select_one('.auto-list-stationlist-number').text.strip()  # 車站序號
+                stop_name = stop.select_one('.auto-list-stationlist-place').text.strip()  # 車站名稱
+                stop_id = stop.select_one('input[name="item.UniStopId"]')['value']  # 車站編號
+                latitude = stop.select_one('input[name="item.Latitude"]')['value']  # 緯度
+                longitude = stop.select_one('input[name="item.Longitude"]')['value']  # 經度
 
-        print(f"站點資料已儲存至 {csv_file}")
+                stops.append([arrival_info, stop_number, stop_name, stop_id, latitude, longitude])
+            except AttributeError:
+                # 不顯示錯誤訊息，直接跳過
+                continue
+
+        # 確保資料夾存在
+        os.makedirs("data", exist_ok=True)
+
+        # 將資料寫入 CSV
+        csv_filename = f"data/bus_route_{self.rid}.csv"
+        with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["arrival_info", "stop_number", "stop_name", "stop_id", "latitude", "longitude"])
+            writer.writerows(stops)
+
+        print(f"資料已儲存至 {csv_filename}")
+
+        # 顯示站點資訊
+        for stop in stops:
+            print(f"到達時間: {stop[0]}, 車站序號: {stop[1]}, 車站名稱: {stop[2]}, 車站編號: {stop[3]}, 緯度: {stop[4]}, 經度: {stop[5]}")
 
 
-# 使用範例
 if __name__ == "__main__":
-    route_id = input("請輸入公車路線 ID (例如 '0100000A00')：")
-    direction = input("請輸入方向 ('go' 或 'come')：")
-    bus_info = BusRouteInfo(routeid=route_id, direction=direction)
+    # 讓使用者輸入公車代碼和方向
+    routeid = input("請輸入公車代碼 (例如: 0100000A00): ").strip()
+    direction = input("請輸入方向 ('go' 或 'come'): ").strip()
+
+    try:
+        route = BusRouteInfo(routeid=routeid, direction=direction)
+    except ValueError as e:
+        print(f"輸入錯誤: {e}")
+    except Exception as e:
+        print(f"發生錯誤: {e}")
