@@ -1,0 +1,92 @@
+# -*- coding: utf-8 -*-
+import pandas as pd
+import re
+import os
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
+
+class BusRouteInfo:
+    def __init__(self, routeid: str, direction: str = 'go'):
+        self.rid = routeid
+        self.direction = self._parse_direction(direction)
+        self.content = None
+        self.url = f'https://ebus.gov.taipei/Route/StopsOfRoute?routeid={routeid}'
+
+        self._fetch_content()
+
+    def _parse_direction(self, direction_input):
+        direction_map = {
+            'go': 'go', 'come': 'come',
+            '去程': 'go', '返程': 'come',
+        }
+        if direction_input not in direction_map:
+            raise ValueError("Direction must be one of ['go', 'come', '去程', '返程']")
+        return direction_map[direction_input]
+
+    def _fetch_content(self):
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(self.url)
+
+            if self.direction == 'come':
+                page.click('a.stationlist-come-go-gray.stationlist-come')
+
+            try:
+                page.wait_for_selector("li.stops-row", timeout=20000)
+            except:
+                print("⚠️ 站牌沒出現，改為固定等待 8 秒")
+                page.wait_for_timeout(8000)
+
+            self.content = page.content()
+            browser.close()
+
+        os.makedirs("data", exist_ok=True)
+        with open(f"data/ebus_taipei_{self.rid}_{self.direction}.html", "w", encoding="utf-8") as file:
+            file.write(self.content)
+
+    def parse_stops(self):
+        if not self.content:
+            raise ValueError("HTML 內容是空的")
+
+        soup = BeautifulSoup(self.content, "html.parser")
+        stops = []
+
+        for li in soup.select("ul.auto-list-pool li"):
+            try:
+                name_tag = li.select_one("span.auto-list-stationlist-place")
+                stop_id_tag = li.select_one("input[name='item.UniStopId']")
+                lat_tag = li.select_one("input[name='item.Latitude']")
+                lon_tag = li.select_one("input[name='item.Longitude']")
+
+                if name_tag and stop_id_tag and lat_tag and lon_tag:
+                    stops.append({
+                        "站牌名稱": name_tag.text.strip(),
+                        "站牌代碼": stop_id_tag["value"],
+                        "緯度": lat_tag["value"],
+                        "經度": lon_tag["value"]
+                    })
+                else:
+                    print("⚠️ 發現站牌欄位缺漏，略過一筆")
+            except Exception as e:
+                print("⚠️ 無法解析某站牌:", e)
+
+        return stops
+
+
+if __name__ == "__main__":
+    # ✅ 修改此處來指定路線 ID
+    route_id = "0100000A00"
+
+    for direction in ['go', 'come']:
+        route = BusRouteInfo(route_id, direction=direction)
+        stops = route.parse_stops()
+        df = pd.DataFrame(stops)
+
+        output_path = f"data/bus_{route.rid}_{route.direction}.csv"
+        df.to_csv(output_path, index=False, encoding="utf-8-sig")
+
+        print(f"✅ 已成功輸出 {output_path}，共 {len(stops)} 筆站牌")
