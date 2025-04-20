@@ -21,5 +21,16 @@ def plot_normal_pdf(mu, sigma):
     plt.savefig('normal_pdf.jpg')
     plt.close()
 
-# 範例呼叫
-plot_normal_pdf(mu=0, sigma=1.0)
+# 手動輸入 μ 和 σ
+try:
+    mu = float(input("請輸入平均值 μ："))
+    sigma = float(input("請輸入標準差 σ："))
+    if sigma <= 0:
+        raise ValueError("標準差 σ 必須大於 0")
+except ValueError as e:
+    print(f"輸入錯誤：{e}")
+    exit()
+
+# 呼叫函式繪製圖表
+plot_normal_pdf(mu, sigma)
+print("圖表已儲存為 'normal_pdf.jpg'")
