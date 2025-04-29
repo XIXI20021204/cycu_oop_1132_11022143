@@ -1,4 +1,4 @@
-import bus_info_11022143  # 確保匯入正確的模組名稱
+import bus_info_11022143
 
 if __name__ == '__main__':
     # 提供多個 bus_id，使用逗號分隔
@@ -10,4 +10,4 @@ if __name__ == '__main__':
     # 逐一處理每個 bus_id
     for bus_id in bus_id_list:
         print(f"正在處理公車路線 {bus_id} 的資訊...")
-        bus_info_11022143.bus_info(bus_id)  # 呼叫正確的模組名稱
+        bus_info_11022143.bus_info(bus_id)
