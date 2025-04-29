@@ -15,9 +15,11 @@ def read_route_csv(csv_path):
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
     return gdf
 
-def draw_multiple_routes(input_files: list, outputfile: str):
+def draw_multiple_routes_with_marker(input_files: list, outputfile: str, station_name: str):
     colors = ['blue', 'green', 'red', 'purple', 'orange']  # 預備多條線用不同顏色
     fig, ax = plt.subplots(figsize=(12, 12))
+
+    station_found = False  # 用於檢查是否找到指定車站
 
     for idx, file in enumerate(input_files):
         gdf = read_route_csv(file)
@@ -34,6 +36,14 @@ def draw_multiple_routes(input_files: list, outputfile: str):
         # 顯示每個站名
         for x, y, name in zip(gdf.geometry.x, gdf.geometry.y, gdf["車站名稱"]):
             ax.text(x, y, name, fontsize=6, ha='left', va='center')
+
+            # 如果車站名稱匹配，繪製人形標記
+            if name == station_name:
+                ax.text(x, y, "👤", fontsize=15, ha='center', va='center', color='black')
+                station_found = True
+
+    if not station_found:
+        print(f"找不到車站名稱：{station_name}")
 
     ax.set_title("多條公車路線圖")
     ax.set_xlabel("經度")
@@ -52,4 +62,7 @@ if __name__ == "__main__":
         "20250429/bus_route_0161001500.csv"
     ]
     outputfile = "20250429/bus_routes_with_lines1.png"
-    draw_multiple_routes(input_files, outputfile)
+
+    # 手動輸入車站名稱
+    station_name = input("請輸入車站名稱：")
+    draw_multiple_routes_with_marker(input_files, outputfile, station_name)
