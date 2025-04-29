@@ -34,7 +34,7 @@ class taipei_route_info:
 
         if self.direction not in ['go', 'come']:
             raise ValueError("Direction must be 'go' or 'come'")
-        
+
         # Save the rendered HTML to a file for inspection
         self.html_file = f"{self.working_directory}/ebus_taipei_{self.route_id}.html"
 
@@ -61,7 +61,8 @@ class taipei_route_info:
             return wkt_dict
         else:
             return {}
-        
+
+
 class taipei_route_list:
     """
     Manages fetching, parsing, and storing route data for Taipei eBus.
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     # Initialize and process route data
     route_list = taipei_route_list()
 
-    # Define an empty GeoDataFrame for gathering all the following data
+    # Initialize an empty GeoDataFrame with the correct structure
     geo_df = gpd.GeoDataFrame(columns=['wkt_id', 'wkt_string', 'route_id', 'route_name', 'geometry'], geometry='geometry', crs='EPSG:4326')
 
     for _, row in route_list.read_from_database().iterrows():

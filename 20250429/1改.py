@@ -3,6 +3,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import matplotlib
 from shapely.geometry import Point, LineString
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import os
 
 # 設定中文字型（支援中文）
@@ -15,7 +16,7 @@ def read_route_csv(csv_path):
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
     return gdf
 
-def draw_multiple_routes_with_marker(input_files: list, outputfile: str, station_name: str):
+def draw_multiple_routes_with_marker(input_files: list, outputfile: str, station_name: str, icon_path: str):
     colors = ['blue', 'green', 'red', 'purple', 'orange']  # 預備多條線用不同顏色
     fig, ax = plt.subplots(figsize=(12, 12))
 
@@ -39,7 +40,13 @@ def draw_multiple_routes_with_marker(input_files: list, outputfile: str, station
 
             # 如果車站名稱匹配，繪製人形標記
             if name == station_name:
-                ax.text(x, y, "👤", fontsize=15, ha='center', va='center', color='black')
+                # 加載圖案
+                img = plt.imread(icon_path)
+                imagebox = OffsetImage(img, zoom=0.05)  # 調整圖案大小
+                # 向左偏移圖案
+                offset_x = x - 0.005  # 調整偏移量，單位為經度
+                ab = AnnotationBbox(imagebox, (offset_x, y), frameon=False)
+                ax.add_artist(ab)
                 station_found = True
 
     if not station_found:
@@ -65,4 +72,5 @@ if __name__ == "__main__":
 
     # 手動輸入車站名稱
     station_name = input("請輸入車站名稱：")
-    draw_multiple_routes_with_marker(input_files, outputfile, station_name)
+    icon_path = "C:/Users/User/Documents/GitHub/cycu_oop_1132_11022143/20250429/1.jpg"  # 圖案的完整路徑
+    draw_multiple_routes_with_marker(input_files, outputfile, station_name, icon_path)

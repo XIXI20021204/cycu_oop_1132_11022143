@@ -121,9 +121,11 @@ class taipei_route_list:
         self.session.query(self.orm).filter_by(route_id=route_id).update({"route_data_updated": route_data_updated})
         self.session.commit()
 
-
     def set_route_data_unexcepted(self, route_id: str):
-        self.session.query(self.orm).filter_by(route_id=route_id).update({"route_data_updated": 2 })
+        """
+        Sets the route_data_updated flag to 2 for unexpected errors.
+        """
+        self.session.query(self.orm).filter_by(route_id=route_id).update({"route_data_updated": 2})
         self.session.commit()
 
     def __del__(self):
@@ -136,122 +138,23 @@ class taipei_route_list:
 
 class taipei_route_info:
     """
-    Manages fetching, parsing, and storing bus stop data for a specified route and direction.
+    Placeholder for taipei_route_info class.
     """
-
-    def __init__(self, route_id: str, direction: str = 'go', working_directory: str = 'data'):
-        """
-        Initializes the taipei_route_info by setting parameters and fetching the webpage content.
-
-        Args:
-            route_id (str): The unique identifier of the bus route.
-            direction (str): The direction of the route; must be either 'go' or 'come'.
-        """
+    def __init__(self, route_id: str, direction: str = 'go'):
         self.route_id = route_id
         self.direction = direction
-        self.content = None
-        self.url = f'https://ebus.gov.taipei/Route/StopsOfRoute?routeid={route_id}'
-        self.working_directory = working_directory
 
-        if self.direction not in ['go', 'come']:
-            raise ValueError("Direction must be 'go' or 'come'")
-
-        self._fetch_content()
-
-    def _fetch_content(self):
+    def parse_route_info(self):
         """
-        Fetches the webpage content using Playwright and writes the rendered HTML to a local file.
+        Placeholder for parsing route info.
         """
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.goto(self.url)
-
-            if self.direction == 'come':
-                page.click('a.stationlist-come-go-gray.stationlist-come')
-
-            page.wait_for_timeout(3000)  # Wait for page render
-            self.content = page.content()
-            browser.close()
-
-        # Save the rendered HTML to a file for inspection
-        self.html_file = f"{self.working_directory}/ebus_taipei_{self.route_id}.html"
-        
-        # with open(html_file, "w", encoding="utf-8") as file:
-        #     file.write(self.content)
-
-    def parse_route_info(self) -> pd.DataFrame:
-        """
-        Parses the fetched HTML content to extract bus stop data.
-
-        Returns:
-            pd.DataFrame: DataFrame containing bus stop information.
-
-        Raises:
-            ValueError: If no data is found for the route.
-        """
-        pattern = re.compile(
-            r'<li>.*?<span class="auto-list-stationlist-position.*?">(.*?)</span>\s*'
-            r'<span class="auto-list-stationlist-number">\s*(\d+)</span>\s*'
-            r'<span class="auto-list-stationlist-place">(.*?)</span>.*?'
-            r'<input[^>]+name="item\.UniStopId"[^>]+value="(\d+)"[^>]*>.*?'
-            r'<input[^>]+name="item\.Latitude"[^>]+value="([\d\.]+)"[^>]*>.*?'
-            r'<input[^>]+name="item\.Longitude"[^>]+value="([\d\.]+)"[^>]*>',
-            re.DOTALL
-        )
-
-        matches = pattern.findall(self.content)
-        if not matches:
-            raise ValueError(f"No data found for route ID {self.route_id}")
-
-        bus_routes = [m for m in matches]
-        self.dataframe = pd.DataFrame(
-            bus_routes,
-            columns=["arrival_info", "stop_number", "stop_name", "stop_id", "latitude", "longitude"]
-        )
-
-        self.dataframe["direction"] = self.direction
-        self.dataframe["route_id"] = self.route_id
-
-        return self.dataframe
+        pass
 
     def save_to_database(self):
         """
-        Saves the parsed bus stop data to the SQLite database.
+        Placeholder for saving route info to database.
         """
-        db_file = f"{self.working_directory}/hermes_ebus_taipei.sqlite3"
-        engine = create_engine(f"sqlite:///{db_file}")
-        Base = declarative_base()
-
-        class bus_stop_orm(Base):
-            __tablename__ = "data_route_info_busstop"
-            stop_id = Column(Integer)
-            arrival_info = Column(String)
-            stop_number = Column(Integer, primary_key=True)
-            stop_name = Column(String)
-            latitude = Column(Float)
-            longitude = Column(Float)
-            direction = Column(String, primary_key=True)
-            route_id = Column(String, primary_key=True)
-
-        Base.metadata.create_all(engine)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
-        for _, row in self.dataframe.iterrows():
-            session.merge(bus_stop_orm(
-                stop_id=row["stop_id"],
-                arrival_info=row["arrival_info"],
-                stop_number=row["stop_number"],
-                stop_name=row["stop_name"],
-                latitude=row["latitude"],
-                longitude=row["longitude"],
-                direction=row["direction"],
-                route_id=row["route_id"]
-            ))
-
-        session.commit()
-        session.close()
+        pass
 
 
 if __name__ == "__main__":
@@ -260,22 +163,24 @@ if __name__ == "__main__":
     route_list.parse_route_list()
     route_list.save_to_database()
 
-    for _, row in route_list.read_from_database().iterrows():
-        if not row["route_data_updated"]:
-            try:
-                route_info = taipei_route_info(route_id=row["route_id"], direction="go")
-                route_info.parse_route_info()
-                route_info.save_to_database()
+    bus1 = '0161000900'  # 承德幹線
+    bus2 = '0161001500'  # 基隆幹線
 
-                route_info = taipei_route_info(route_id=row["route_id"], direction="come")
-                route_info.parse_route_info()
-                route_info.save_to_database()
+    bus_list = [bus1]
 
-                route_list.set_route_data_updated(route_id=row["route_id"])
-                print(f"Route data for {row['route_name']} updated.")
+    for route_id in bus_list:
+        try:
+            route_info = taipei_route_info(route_id, direction="go")
+            route_info.parse_route_info()
+            route_info.save_to_database()
 
-            except Exception as e:
-                print(f"Error processing route {row['route_name']}: {e}")
-                route_list.set_route_data_unexcepted(route_id=row["route_id"])
-        else:
-            print(f"Route data for {row['route_name']} already updated.")
+            # Example output for debugging
+            print(f"Processed route: {route_id}")
+
+            route_list.set_route_data_updated(route_id)
+            print(f"Route data for {route_id} updated.")
+
+        except Exception as e:
+            print(f"Error processing route {route_id}: {e}")
+            route_list.set_route_data_unexcepted(route_id)
+            continue
