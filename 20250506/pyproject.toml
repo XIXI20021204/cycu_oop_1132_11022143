@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cycu25305"
+name = "cycu11022143"
 version = "0.1.0"
-description = "A short description of the cycu25305 package"
+description = "A short description of the cycu11022143 package"
 readme = "README.md"
 requires-python = ">=3.7"
 authors = [
