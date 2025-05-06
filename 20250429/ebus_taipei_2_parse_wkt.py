@@ -6,8 +6,6 @@ saves the rendered HTML and CSV file, and stores the parsed data in a SQLite dat
 import json
 import re
 import pandas as pd
-import geopandas as gpd
-from shapely.geometry import Point
 from playwright.sync_api import sync_playwright
 from sqlalchemy import create_engine, Column, String, Float, Integer, Boolean
 from sqlalchemy.orm import sessionmaker
@@ -34,11 +32,11 @@ class taipei_route_info:
 
         if self.direction not in ['go', 'come']:
             raise ValueError("Direction must be 'go' or 'come'")
-
+        
         # Save the rendered HTML to a file for inspection
         self.html_file = f"{self.working_directory}/ebus_taipei_{self.route_id}.html"
 
-        # Read self.content from the self.html_file
+        #read self.content from the self.html_file
         with open(self.html_file, 'r', encoding='utf-8') as file:
             self.content = file.read()
 
@@ -49,20 +47,22 @@ class taipei_route_info:
         Returns:
             dict: A dictionary where each key is a 'wkt' field and the value is its corresponding LINESTRING data.
         """
+
         wkt_dict = {}
         pattern = r'JSON\.stringify\s*\(\s*(\{[\s\S]*?\})\s*\)'
         match = re.search(pattern, self.content)
         if match:
             json_text = match.group(1)
+            
             json_dict = json.loads(json_text)
             for key in json_dict.keys():
                 if key.startswith('wkt'):
                     wkt_dict[key] = json_dict[key]
+            
             return wkt_dict
         else:
             return {}
-
-
+        
 class taipei_route_list:
     """
     Manages fetching, parsing, and storing route data for Taipei eBus.
@@ -102,6 +102,7 @@ class taipei_route_list:
 
         self.html_file_path = f'{self.working_directory}/hermes_ebus_taipei_route_list.html'
 
+
     def read_from_database(self) -> pd.DataFrame:
         """
         Reads bus route data from the SQLite database.
@@ -114,26 +115,34 @@ class taipei_route_list:
         return self.db_dataframe
 
 
+
+
 if __name__ == "__main__":
     # Initialize and process route data
     route_list = taipei_route_list()
-
-    # Initialize an empty GeoDataFrame with the correct structure
-    geo_df = gpd.GeoDataFrame(columns=['wkt_id', 'wkt_string', 'route_id', 'route_name', 'geometry'], geometry='geometry', crs='EPSG:4326')
+    #define a empty geodataframe for gathering all the following df 
+    geo_df = pd.DataFrame()    
 
     for _, row in route_list.read_from_database().iterrows():
         try:
             route_info = taipei_route_info(route_id=row["route_id"], direction="go")
             dict_wkt = route_info.parse_wkt_fields()
 
-            # Save the parsed data to a DataFrame
+            # Save the parsed data to a CSV file
             df = pd.DataFrame(dict_wkt.items(), columns=['wkt_id', 'wkt_string'])
             df['route_id'] = route_info.route_id
             df['route_name'] = row["route_name"]
 
-            # Convert DataFrame to GeoDataFrame
+            #convert df to geodataframe
+            import geopandas as gpd
             df['geometry'] = gpd.GeoSeries.from_wkt(df['wkt_string'])
-            df = gpd.GeoDataFrame(df, geometry='geometry', crs='EPSG:4326')
+            df = gpd.GeoDataFrame(df, geometry='geometry')
+ 
+            # Set the coordinate reference system (CRS) to WGS84
+            df.crs = 'EPSG:4326'
+            # Set the geometry column
+            df.set_geometry('geometry', inplace=True)
+
 
             # Append the new data to the existing GeoDataFrame
             geo_df = pd.concat([geo_df, df], ignore_index=True)

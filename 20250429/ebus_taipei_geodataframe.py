@@ -254,6 +254,24 @@ class taipei_route_info:
         session.close()
 
 
+
+def convert_to_geodataframe( df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Converts a DataFrame to a GeoDataFrame.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to convert.
+
+    Returns:
+        gpd.GeoDataFrame: The converted GeoDataFrame.
+    """
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    geometry = [Point(xy) for xy in zip(df["longitude"], df["latitude"])]
+    gdf = gpd.GeoDataFrame(df, geometry=geometry)
+    return gdf  
+
 if __name__ == "__main__":
     # Initialize and process route data
     route_list = taipei_route_list()
@@ -268,7 +286,7 @@ if __name__ == "__main__":
 
     for route_id in bus_list:
         try:
-            route_info = taipei_route_info(route_id, direction="go")
+            route_info = taipei_route_info(route_id, direction="come")
             route_info.parse_route_info()
             route_info.save_to_database()
 
@@ -276,6 +294,23 @@ if __name__ == "__main__":
             for index, row in route_info.dataframe.iterrows():
                 print(f"Stop Number: {row['stop_number']}, Stop Name: {row['stop_name']}, "
                       f"Latitude: {row['latitude']}, Longitude: {row['longitude']}")
+
+            gpdf = convert_to_geodataframe(route_info.dataframe)
+
+
+            #draw gpdf to data/ebus.png using matplotlib
+            import matplotlib.pyplot as plt
+            import geopandas as gpd
+      
+            plt.figure(figsize=(10, 10))
+            gpdf.plot(color='blue', markersize=5, alpha=0.5)
+            plt.title(f"Bus Route {route_id} - {route_info.direction.capitalize()} Direction")
+            plt.xlabel("Longitude")
+            plt.ylabel("Latitude")
+            plt.savefig(f"data/ebus_{route_id}_{route_info.direction}.png")
+            plt.close()
+
+
 
             # route_info = taipei_route_info(route_id, direction="come")
             # route_info.parse_route_info()
