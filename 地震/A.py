@@ -1,52 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import odeint
 
-# 讀取地震加速度資料 (假設是兩欄：時間(s), 加速度(g))
-data = np.loadtxt('Northridge_NS.txt')
+# 讀取 Northridge 地震資料（時間, 加速度(g)）
+data = np.loadtxt('/mnt/data/Northridge_NS.txt')
 time = data[:, 0]
-acc = data[:, 1] * 9.81  # 轉換為 m/s²
+acc_g = data[:, 1]
+acc_mps2 = acc_g * 9.81  # 轉換為 m/s²
 
-# 定義參數
-zeta = 0.05  # 阻尼比 5%
-periods = np.logspace(-1, 1, 100)  # T from 0.1 to 10 s
-omega = 2 * np.pi / periods
-
-# 儲存最大反應
-Sd = []  # 最大位移
-Sv = []  # 最大速度
-Sa = []  # 最大加速度
-
-# 計算 SDOF 反應譜
-for w in omega:
-    k = 1.0
-    m = 1.0
-    c = 2 * zeta * m * w
-    def sdof_eq(u, t):
-        x, xdot = u
-        interp_acc = np.interp(t, time, acc)
-        xddot = (-c * xdot - k * x) / m - interp_acc
-        return [xdot, xddot]
-
-    u0 = [0.0, 0.0]
-    sol = odeint(sdof_eq, u0, time)
-    x = sol[:, 0]
-    xdot = sol[:, 1]
-    xddot = -2 * zeta * w * xdot - w**2 * x
-
-    Sd.append(np.max(np.abs(x)))
-    Sv.append(np.max(np.abs(xdot)))
-    Sa.append(np.max(np.abs(xddot)))
+# 計算最大地震加速度
+pga = np.max(np.abs(acc_mps2))
 
 # 畫圖
-plt.figure(figsize=(10, 6))
-plt.loglog(periods, Sa, label='加速度譜 (Sa)', color='r')
-plt.loglog(periods, Sv, label='速度譜 (Sv)', color='g')
-plt.loglog(periods, Sd, label='位移譜 (Sd)', color='b')
-plt.xlabel('週期 T (秒)')
-plt.ylabel('反應 (最大值)')
-plt.title('反應譜（Northridge 地震）ζ = 0.05')
-plt.grid(which='both')
+plt.figure(figsize=(10, 4))
+plt.plot(time, acc_mps2, label='地震加速度 $\\ddot{x}_g(t)$ [m/s²]', color='blue')
+plt.axhline(pga, color='red', linestyle='--', label=f'Max = {pga:.2f} m/s²')
+plt.axhline(-pga, color='red', linestyle='--')
+plt.xlabel('時間 (秒)')
+plt.ylabel('加速度 (m/s²)')
+plt.title('地震加速度歷時圖 (Northridge NS Direction)')
+plt.grid(True)
 plt.legend()
 plt.tight_layout()
 plt.show()
