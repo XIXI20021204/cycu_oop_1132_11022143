@@ -1,6 +1,5 @@
 import numpy as np
 
-# 已知參數 (根據您的圖片)
 W_ksi = 290  # ksi (結構重量)
 g_in_s2 = 386.4 # in/s^2 (重力加速度)
 L_columns_ft = 14 # ft (柱高)
