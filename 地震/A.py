@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 # 檔案路徑
-file_path = "C:\\Users\\truck\\Downloads\\Northridge_NS.txt"
+file_path = "C:\\Users\\a0965\\Downloads\\Northridge_NS.txt"
 
 try:
     # 讀取 Northridge_NS.txt 檔案中的資料
