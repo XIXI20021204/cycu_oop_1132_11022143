@@ -1,24 +1,42 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-# 讀取 Northridge 地震資料（時間, 加速度(g)）
-data = np.loadtxt('/mnt/data/Northridge_NS.txt')
-time = data[:, 0]
-acc_g = data[:, 1]
-acc_mps2 = acc_g * 9.81  # 轉換為 m/s²
+# 檔案路徑
+file_path = "C:\\Users\\truck\\Downloads\\Northridge_NS.txt"
 
-# 計算最大地震加速度
-pga = np.max(np.abs(acc_mps2))
+try:
+    # 讀取 Northridge_NS.txt 檔案中的資料
+    data = np.loadtxt(file_path)
+    time = data[:, 0]        # 時間 (s)
+    acceleration = data[:, 1]  # 加速度 (g)
 
-# 畫圖
-plt.figure(figsize=(10, 4))
-plt.plot(time, acc_mps2, label='地震加速度 $\\ddot{x}_g(t)$ [m/s²]', color='blue')
-plt.axhline(pga, color='red', linestyle='--', label=f'Max = {pga:.2f} m/s²')
-plt.axhline(-pga, color='red', linestyle='--')
-plt.xlabel('時間 (秒)')
-plt.ylabel('加速度 (m/s²)')
-plt.title('地震加速度歷時圖 (Northridge NS Direction)')
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
-plt.show()
+    # 將加速度單位從 g 轉為 m/s^2
+    acceleration_ms2 = acceleration * 9.81
+
+    # 繪製加速度-時間圖形
+    plt.figure(figsize=(10, 6))
+    plt.plot(time, acceleration_ms2)
+    plt.xlabel("Time (s)")
+    plt.ylabel("Acceleration (m/s^2)")
+    plt.title("Northridge Earthquake Acceleration")
+    plt.grid(True)
+
+    # 找出最大加速度及其對應時間
+    max_acceleration = np.max(np.abs(acceleration_ms2))
+    max_acceleration_time = time[np.argmax(np.abs(acceleration_ms2))]
+
+    # 顯示最大加速度
+    plt.plot(max_acceleration_time, max_acceleration, 'ro')  # 標示最大值
+    plt.text(max_acceleration_time, max_acceleration, f'Max: {max_acceleration:.2f} m/s^2',
+             verticalalignment='bottom', horizontalalignment='right')
+
+    plt.show()
+
+    # 輸出最大加速度值
+    print(f"Maximum acceleration: {max_acceleration:.2f} m/s^2")
+
+except FileNotFoundError:
+    print(f"錯誤：找不到檔案 {file_path}")
+except Exception as e:
+    print(f"發生錯誤：{e}")
