@@ -30,4 +30,4 @@ if __name__ == "__main__":
     # Example usage of the methods (to be implemented)
     # bus.get_route_info()
     # bus.get_stop_info()
-    # bus.get_arrival_time_info()需安裝
+    # bus.get_arrival_time_info()
