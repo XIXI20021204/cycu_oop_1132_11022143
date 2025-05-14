@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_c884e3b726a71bcd3647ecaea4a29fe4 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_c884e3b726a71bcd3647ecaea4a29fe4" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_c884e3b726a71bcd3647ecaea4a29fe4 = L.map(
+                "map_c884e3b726a71bcd3647ecaea4a29fe4",
+                {
+                    center: [25.127225, 121.4978596],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_3cac4969878003c2513b56755e7c04c9 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_3cac4969878003c2513b56755e7c04c9.addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+
+        function geo_json_96065b541847049bc8adb8eef76d4997_onEachFeature(feature, layer) {
+            layer.on({
+            });
+        };
+        var geo_json_96065b541847049bc8adb8eef76d4997 = L.geoJson(null, {
+                onEachFeature: geo_json_96065b541847049bc8adb8eef76d4997_onEachFeature,
+            
+            ...{
+}
+        });
+
+        function geo_json_96065b541847049bc8adb8eef76d4997_add (data) {
+            geo_json_96065b541847049bc8adb8eef76d4997
+                .addData(data);
+        }
+            geo_json_96065b541847049bc8adb8eef76d4997_add({"features": [{"geometry": {"coordinates": [121.4978596, 25.127225], "type": "Point"}, "id": "0", "properties": {"latitude": 25.127225, "longitude": 121.4978596, "\u516c\u8eca\u5230\u9054\u6642\u9593": "3\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u9cf3\u7532\u7f8e\u8853\u9928", "\u8eca\u7ad9\u5e8f\u865f": 16, "\u8eca\u7ad9\u7de8\u865f": 1126800840}, "type": "Feature"}, {"geometry": {"coordinates": [121.499222, 25.122429], "type": "Point"}, "id": "1", "properties": {"latitude": 25.122429, "longitude": 121.499222, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5927\u696d\u8def(\u8fb2\u79aa\u5bfa)", "\u8eca\u7ad9\u5e8f\u865f": 17, "\u8eca\u7ad9\u7de8\u865f": 1126800440}, "type": "Feature"}, {"geometry": {"coordinates": [121.501973, 25.118907], "type": "Point"}, "id": "2", "properties": {"latitude": 25.118907, "longitude": 121.501973, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u627f\u5fb7\u516c\u9928\u8def\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 18, "\u8eca\u7ad9\u7de8\u865f": 1126200430}, "type": "Feature"}, {"geometry": {"coordinates": [121.503568, 25.117433], "type": "Point"}, "id": "3", "properties": {"latitude": 25.117433, "longitude": 121.503568, "\u516c\u8eca\u5230\u9054\u6642\u9593": "6\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u7acb\u8fb2\u570b\u5c0f", "\u8eca\u7ad9\u5e8f\u865f": 19, "\u8eca\u7ad9\u7de8\u865f": 1126200240}, "type": "Feature"}, {"geometry": {"coordinates": [121.5064388, 25.114726], "type": "Point"}, "id": "4", "properties": {"latitude": 25.114726, "longitude": 121.5064388, "\u516c\u8eca\u5230\u9054\u6642\u9593": "7\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5be6\u8e10\u8857\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 20, "\u8eca\u7ad9\u7de8\u865f": 1126200640}, "type": "Feature"}, {"geometry": {"coordinates": [121.508727, 25.112706], "type": "Point"}, "id": "5", "properties": {"latitude": 25.112706, "longitude": 121.508727, "\u516c\u8eca\u5230\u9054\u6642\u9593": "8\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u627f\u5fb7\u8def\u4e03\u6bb5", "\u8eca\u7ad9\u5e8f\u865f": 21, "\u8eca\u7ad9\u7de8\u865f": 1126200540}, "type": "Feature"}, {"geometry": {"coordinates": [121.512347, 25.109536], "type": "Point"}, "id": "6", "properties": {"latitude": 25.109536, "longitude": 121.512347, "\u516c\u8eca\u5230\u9054\u6642\u9593": "10\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u77f3\u724c", "\u8eca\u7ad9\u5e8f\u865f": 22, "\u8eca\u7ad9\u7de8\u865f": 1128700240}, "type": "Feature"}, {"geometry": {"coordinates": [121.5139733, 25.108034], "type": "Point"}, "id": "7", "properties": {"latitude": 25.108034, "longitude": 121.5139733, "\u516c\u8eca\u5230\u9054\u6642\u9593": "11\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6587\u6797\u570b\u5c0f", "\u8eca\u7ad9\u5e8f\u865f": 23, "\u8eca\u7ad9\u7de8\u865f": 1128700140}, "type": "Feature"}, {"geometry": {"coordinates": [121.517803, 25.105059], "type": "Point"}, "id": "8", "properties": {"latitude": 25.105059, "longitude": 121.517803, "\u516c\u8eca\u5230\u9054\u6642\u9593": "12\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u4e2d\u6b63\u9ad8\u4e2d", "\u8eca\u7ad9\u5e8f\u865f": 24, "\u8eca\u7ad9\u7de8\u865f": 1128700040}, "type": "Feature"}, {"geometry": {"coordinates": [121.5204736, 25.102263], "type": "Point"}, "id": "9", "properties": {"latitude": 25.102263, "longitude": 121.5204736, "\u516c\u8eca\u5230\u9054\u6642\u9593": "13\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u829d\u5c71\u7ad9(\u6232\u66f2\u4e2d\u5fc3)", "\u8eca\u7ad9\u5e8f\u865f": 25, "\u8eca\u7ad9\u7de8\u865f": 1115900240}, "type": "Feature"}, {"geometry": {"coordinates": [121.5223075, 25.100849], "type": "Point"}, "id": "10", "properties": {"latitude": 25.100849, "longitude": 121.5223075, "\u516c\u8eca\u5230\u9054\u6642\u9593": "15\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u829d\u5c71\u7ad9\u4e00", "\u8eca\u7ad9\u5e8f\u865f": 26, "\u8eca\u7ad9\u7de8\u865f": 1115900340}, "type": "Feature"}, {"geometry": {"coordinates": [121.524748, 25.084849], "type": "Point"}, "id": "11", "properties": {"latitude": 25.084849, "longitude": 121.524748, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u528d\u6f6d\u7ad9(\u5317\u85dd\u4e2d\u5fc3)", "\u8eca\u7ad9\u5e8f\u865f": 29, "\u8eca\u7ad9\u7de8\u865f": 1114100440}, "type": "Feature"}, {"geometry": {"coordinates": [121.5233264, 25.083468], "type": "Point"}, "id": "12", "properties": {"latitude": 25.083468, "longitude": 121.5233264, "\u516c\u8eca\u5230\u9054\u6642\u9593": "8\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5713\u5c71\u7687\u5bae\u5927\u5ec8", "\u8eca\u7ad9\u5e8f\u865f": 30, "\u8eca\u7ad9\u7de8\u865f": 1116600140}, "type": "Feature"}, {"geometry": {"coordinates": [121.5223096, 25.081056], "type": "Point"}, "id": "13", "properties": {"latitude": 25.081056, "longitude": 121.5223096, "\u516c\u8eca\u5230\u9054\u6642\u9593": "9\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u528d\u6f6d\u570b\u5c0f", "\u8eca\u7ad9\u5e8f\u865f": 31, "\u8eca\u7ad9\u7de8\u865f": 1116600240}, "type": "Feature"}, {"geometry": {"coordinates": [121.5191524, 25.07344], "type": "Point"}, "id": "14", "properties": {"latitude": 25.07344, "longitude": 121.5191524, "\u516c\u8eca\u5230\u9054\u6642\u9593": "11\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u660e\u502b\u9ad8\u4e2d", "\u8eca\u7ad9\u5e8f\u865f": 32, "\u8eca\u7ad9\u7de8\u865f": 1036700240}, "type": "Feature"}, {"geometry": {"coordinates": [121.5182673, 25.067913], "type": "Point"}, "id": "15", "properties": {"latitude": 25.067913, "longitude": 121.5182673, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6c11\u65cf\u627f\u5fb7\u8def\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 34, "\u8eca\u7ad9\u7de8\u865f": 1036500040}, "type": "Feature"}, {"geometry": {"coordinates": [121.5181, 25.064874], "type": "Point"}, "id": "16", "properties": {"latitude": 25.064874, "longitude": 121.5181, "\u516c\u8eca\u5230\u9054\u6642\u9593": "6\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5927\u540c\u570b\u5c0f", "\u8eca\u7ad9\u5e8f\u865f": 35, "\u8eca\u7ad9\u7de8\u865f": 1036300040}, "type": "Feature"}, {"geometry": {"coordinates": [121.518152, 25.062226], "type": "Point"}, "id": "17", "properties": {"latitude": 25.062226, "longitude": 121.518152, "\u516c\u8eca\u5230\u9054\u6642\u9593": "9\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6210\u6df5\u9ad8\u4e2d", "\u8eca\u7ad9\u5e8f\u865f": 36, "\u8eca\u7ad9\u7de8\u865f": 1036000040}, "type": "Feature"}, {"geometry": {"coordinates": [121.5179896, 25.056725], "type": "Point"}, "id": "18", "properties": {"latitude": 25.056725, "longitude": 121.5179896, "\u516c\u8eca\u5230\u9054\u6642\u9593": "12\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6c11\u751f\u897f\u8def\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 37, "\u8eca\u7ad9\u7de8\u865f": 1035300140}, "type": "Feature"}, {"geometry": {"coordinates": [121.5196749, 25.05271], "type": "Point"}, "id": "19", "properties": {"latitude": 25.05271, "longitude": 121.5196749, "\u516c\u8eca\u5230\u9054\u6642\u9593": "14\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u4e2d\u5c71\u7ad9(\u5fd7\u4ec1\u9ad8\u4e2d)", "\u8eca\u7ad9\u5e8f\u865f": 38, "\u8eca\u7ad9\u7de8\u865f": 1035200120}, "type": "Feature"}, {"geometry": {"coordinates": [121.5362725, 25.051938], "type": "Point"}, "id": "20", "properties": {"latitude": 25.051938, "longitude": 121.5362725, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5357\u4eac\u5efa\u570b\u8def\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 42, "\u8eca\u7ad9\u7de8\u865f": 1048700320}, "type": "Feature"}, {"geometry": {"coordinates": [121.5401689, 25.051888], "type": "Point"}, "id": "21", "properties": {"latitude": 25.051888, "longitude": 121.5401689, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5357\u4eac\u9f8d\u6c5f\u8def\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 43, "\u8eca\u7ad9\u7de8\u865f": 1048700420}, "type": "Feature"}, {"geometry": {"coordinates": [121.5435614, 25.051804], "type": "Point"}, "id": "22", "properties": {"latitude": 25.051804, "longitude": 121.5435614, "\u516c\u8eca\u5230\u9054\u6642\u9593": "7\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u5357\u4eac\u5fa9\u8208\u7ad9", "\u8eca\u7ad9\u5e8f\u865f": 44, "\u8eca\u7ad9\u7de8\u865f": 1055000120}, "type": "Feature"}, {"geometry": {"coordinates": [121.5483534, 25.051703], "type": "Point"}, "id": "23", "properties": {"latitude": 25.051703, "longitude": 121.5483534, "\u516c\u8eca\u5230\u9054\u6642\u9593": "9\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5357\u4eac\u6566\u5316\u8def\u53e3(\u5c0f\u5de8\u86cb)", "\u8eca\u7ad9\u5e8f\u865f": 45, "\u8eca\u7ad9\u7de8\u865f": 1055100220}, "type": "Feature"}, {"geometry": {"coordinates": [121.5547373, 25.051548], "type": "Point"}, "id": "24", "properties": {"latitude": 25.051548, "longitude": 121.5547373, "\u516c\u8eca\u5230\u9054\u6642\u9593": "11\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5357\u4eac\u5be7\u5b89\u8857\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 46, "\u8eca\u7ad9\u7de8\u865f": 1058000020}, "type": "Feature"}, {"geometry": {"coordinates": [121.557568, 25.042558], "type": "Point"}, "id": "25", "properties": {"latitude": 25.042558, "longitude": 121.557568, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u570b\u7236\u7d00\u5ff5\u9928\u7ad9(\u5149\u5fa9)", "\u8eca\u7ad9\u5e8f\u865f": 49, "\u8eca\u7ad9\u7de8\u865f": 1069400140}, "type": "Feature"}, {"geometry": {"coordinates": [121.55745, 25.03669], "type": "Point"}, "id": "26", "properties": {"latitude": 25.03669, "longitude": 121.55745, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5e02\u6c11\u4f4f\u5b85", "\u8eca\u7ad9\u5e8f\u865f": 51, "\u8eca\u7ad9\u7de8\u865f": 1069500140}, "type": "Feature"}, {"geometry": {"coordinates": [121.5573365, 25.034098], "type": "Point"}, "id": "27", "properties": {"latitude": 25.034098, "longitude": 121.5573365, "\u516c\u8eca\u5230\u9054\u6642\u9593": "6\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u4e09\u5f35\u7281", "\u8eca\u7ad9\u5e8f\u865f": 52, "\u8eca\u7ad9\u7de8\u865f": 1069500040}, "type": "Feature"}, {"geometry": {"coordinates": [121.56127, 25.031446], "type": "Point"}, "id": "28", "properties": {"latitude": 25.031446, "longitude": 121.56127, "\u516c\u8eca\u5230\u9054\u6642\u9593": "10\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u4e16\u8cbf\u4e2d\u5fc3(\u838a\u656c)", "\u8eca\u7ad9\u5e8f\u865f": 53, "\u8eca\u7ad9\u7de8\u865f": 1104900140}, "type": "Feature"}, {"geometry": {"coordinates": [121.5624103, 25.02923], "type": "Point"}, "id": "29", "properties": {"latitude": 25.02923, "longitude": 121.5624103, "\u516c\u8eca\u5230\u9054\u6642\u9593": "12\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u666f\u65b0\u91cc", "\u8eca\u7ad9\u5e8f\u865f": 54, "\u8eca\u7ad9\u7de8\u865f": 1104900440}, "type": "Feature"}, {"geometry": {"coordinates": [121.5632643, 25.028273], "type": "Point"}, "id": "30", "properties": {"latitude": 25.028273, "longitude": 121.5632643, "\u516c\u8eca\u5230\u9054\u6642\u9593": "13\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u81fa\u5317\u91ab\u5b78\u5927\u5b78", "\u8eca\u7ad9\u5e8f\u865f": 55, "\u8eca\u7ad9\u7de8\u865f": 1105000340}, "type": "Feature"}, {"geometry": {"coordinates": [121.565724, 25.027402], "type": "Point"}, "id": "31", "properties": {"latitude": 25.027402, "longitude": 121.565724, "\u516c\u8eca\u5230\u9054\u6642\u9593": "14\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u4fe1\u7fa9\u570b\u4e2d(\u838a\u656c)", "\u8eca\u7ad9\u5e8f\u865f": 56, "\u8eca\u7ad9\u7de8\u865f": 1105000240}, "type": "Feature"}, {"geometry": {"coordinates": [121.568554, 25.026231], "type": "Point"}, "id": "32", "properties": {"latitude": 25.026231, "longitude": 121.568554, "\u516c\u8eca\u5230\u9054\u6642\u9593": "16\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5433\u8208\u570b\u5c0f(\u677e\u4ec1)", "\u8eca\u7ad9\u5e8f\u865f": 57, "\u8eca\u7ad9\u7de8\u865f": 1104600040}, "type": "Feature"}, {"geometry": {"coordinates": [121.569585, 25.024432], "type": "Point"}, "id": "33", "properties": {"latitude": 25.024432, "longitude": 121.569585, "\u516c\u8eca\u5230\u9054\u6642\u9593": "17\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u677e\u4ec1\u8def", "\u8eca\u7ad9\u5e8f\u865f": 58, "\u8eca\u7ad9\u7de8\u865f": 1104600240}, "type": "Feature"}, {"geometry": {"coordinates": [121.5695997, 25.02453], "type": "Point"}, "id": "34", "properties": {"latitude": 25.02453, "longitude": 121.5695997, "\u516c\u8eca\u5230\u9054\u6642\u9593": "17\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u677e\u4ec1\u8def", "\u8eca\u7ad9\u5e8f\u865f": 59, "\u8eca\u7ad9\u7de8\u865f": 1104600200}, "type": "Feature"}, {"geometry": {"coordinates": [121.5684464, 25.03369], "type": "Point"}, "id": "35", "properties": {"latitude": 25.03369, "longitude": 121.5684464, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u4fe1\u7fa9\u677e\u4ec1\u8def\u53e3(\u677e\u4ec1)", "\u8eca\u7ad9\u5e8f\u865f": 63, "\u8eca\u7ad9\u7de8\u865f": 1105800400}, "type": "Feature"}, {"geometry": {"coordinates": [121.5646562, 25.035907], "type": "Point"}, "id": "36", "properties": {"latitude": 25.035907, "longitude": 121.5646562, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5e02\u653f\u5e9c(\u677e\u58fd)", "\u8eca\u7ad9\u5e8f\u865f": 65, "\u8eca\u7ad9\u7de8\u865f": 1105100360}, "type": "Feature"}, {"geometry": {"coordinates": [121.5636251, 25.038366], "type": "Point"}, "id": "37", "properties": {"latitude": 25.038366, "longitude": 121.5636251, "\u516c\u8eca\u5230\u9054\u6642\u9593": "6\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5e02\u653f\u5e9c(\u5e02\u5e9c)", "\u8eca\u7ad9\u5e8f\u865f": 66, "\u8eca\u7ad9\u7de8\u865f": 1100800100}, "type": "Feature"}, {"geometry": {"coordinates": [121.5653493, 25.041057], "type": "Point"}, "id": "38", "properties": {"latitude": 25.041057, "longitude": 121.5653493, "\u516c\u8eca\u5230\u9054\u6642\u9593": "8\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u5e02\u653f\u5e9c\u7ad9", "\u8eca\u7ad9\u5e8f\u865f": 67, "\u8eca\u7ad9\u7de8\u865f": 1107100120}, "type": "Feature"}], "type": "FeatureCollection"});
+        geo_json_96065b541847049bc8adb8eef76d4997.setStyle(function(feature) {return feature.properties.style;});
+
+        
+    
+            geo_json_96065b541847049bc8adb8eef76d4997.addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            var marker_8d0b4f1878642a6e053990b47219c4e8 = L.marker(
+                [25.127225, 121.4978596],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_8d0b4f1878642a6e053990b47219c4e8.bindTooltip(
+                `<div>
+                     鳳甲美術館
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_6a0023e8bdb8f30f7af309381f3fed92 = L.marker(
+                [25.122429, 121.499222],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_6a0023e8bdb8f30f7af309381f3fed92.bindTooltip(
+                `<div>
+                     大業路(農禪寺)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_b32b639eec3d6207171d4b0d82ac5e99 = L.marker(
+                [25.118907, 121.501973],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_b32b639eec3d6207171d4b0d82ac5e99.bindTooltip(
+                `<div>
+                     承德公館路口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_76010bf112037fdcb0cccefc4f21b9ea = L.marker(
+                [25.117433, 121.503568],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_76010bf112037fdcb0cccefc4f21b9ea.bindTooltip(
+                `<div>
+                     立農國小
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_d310184fa48093c29c288b5837037726 = L.marker(
+                [25.114726, 121.5064388],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_d310184fa48093c29c288b5837037726.bindTooltip(
+                `<div>
+                     實踐街口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_44aa1de5fea0287bed3a6f44fbeb6b1a = L.marker(
+                [25.112706, 121.508727],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_44aa1de5fea0287bed3a6f44fbeb6b1a.bindTooltip(
+                `<div>
+                     承德路七段
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_259caf1ea0f4887957983ae67deadd55 = L.marker(
+                [25.109536, 121.512347],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_259caf1ea0f4887957983ae67deadd55.bindTooltip(
+                `<div>
+                     石牌
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_cefed8d4a0ec9777bfb882c7cbb89794 = L.marker(
+                [25.108034, 121.5139733],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_cefed8d4a0ec9777bfb882c7cbb89794.bindTooltip(
+                `<div>
+                     文林國小
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_f5161ac3aa06274397d1b1242539ec2e = L.marker(
+                [25.105059, 121.517803],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_f5161ac3aa06274397d1b1242539ec2e.bindTooltip(
+                `<div>
+                     中正高中
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_e45929f0a45a80b7a05945bfa102f662 = L.marker(
+                [25.102263, 121.5204736],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_e45929f0a45a80b7a05945bfa102f662.bindTooltip(
+                `<div>
+                     捷運芝山站(戲曲中心)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_5a01caa4a7f693def4a6a7cc5e839bea = L.marker(
+                [25.100849, 121.5223075],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_5a01caa4a7f693def4a6a7cc5e839bea.bindTooltip(
+                `<div>
+                     捷運芝山站一
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_c7ea8dc2009962d80b6694292b913759 = L.marker(
+                [25.084849, 121.524748],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_c7ea8dc2009962d80b6694292b913759.bindTooltip(
+                `<div>
+                     捷運劍潭站(北藝中心)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_732a84d8416eb7eb4a007f0bb95a86ae = L.marker(
+                [25.083468, 121.5233264],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_732a84d8416eb7eb4a007f0bb95a86ae.bindTooltip(
+                `<div>
+                     圓山皇宮大廈
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_79987a3b4911062461876bb96475185c = L.marker(
+                [25.081056, 121.5223096],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_79987a3b4911062461876bb96475185c.bindTooltip(
+                `<div>
+                     劍潭國小
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_a0a322aaba6ce961dd999161b1b5ba2d = L.marker(
+                [25.07344, 121.5191524],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_a0a322aaba6ce961dd999161b1b5ba2d.bindTooltip(
+                `<div>
+                     明倫高中
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_082dbea70409394f57da87f9821cddeb = L.marker(
+                [25.067913, 121.5182673],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_082dbea70409394f57da87f9821cddeb.bindTooltip(
+                `<div>
+                     民族承德路口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_ca59ae4ae98a538b6d5128f2d493e0ae = L.marker(
+                [25.064874, 121.5181],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_ca59ae4ae98a538b6d5128f2d493e0ae.bindTooltip(
+                `<div>
+                     大同國小
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_f1d9379a191f864570dfa2bbf7f3ce12 = L.marker(
+                [25.062226, 121.518152],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_f1d9379a191f864570dfa2bbf7f3ce12.bindTooltip(
+                `<div>
+                     成淵高中
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_0bdd23f23d6f664d8a07f0d506c252ce = L.marker(
+                [25.056725, 121.5179896],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_0bdd23f23d6f664d8a07f0d506c252ce.bindTooltip(
+                `<div>
+                     民生西路口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_57ac380ad32b9ddc8db02ddfd8358d8d = L.marker(
+                [25.05271, 121.5196749],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_57ac380ad32b9ddc8db02ddfd8358d8d.bindTooltip(
+                `<div>
+                     捷運中山站(志仁高中)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_448e5b6c0fa71dd7839a172b707bf8b0 = L.marker(
+                [25.051938, 121.5362725],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_448e5b6c0fa71dd7839a172b707bf8b0.bindTooltip(
+                `<div>
+                     南京建國路口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_e4e42f4f55424800d5b22d6b4c7bab1c = L.marker(
+                [25.051888, 121.5401689],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_e4e42f4f55424800d5b22d6b4c7bab1c.bindTooltip(
+                `<div>
+                     南京龍江路口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_6d3da2e68c10bbd28dba9558990e33ab = L.marker(
+                [25.051804, 121.5435614],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_6d3da2e68c10bbd28dba9558990e33ab.bindTooltip(
+                `<div>
+                     捷運南京復興站
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_00bf8224331247296d6e8bd6766011d7 = L.marker(
+                [25.051703, 121.5483534],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_00bf8224331247296d6e8bd6766011d7.bindTooltip(
+                `<div>
+                     南京敦化路口(小巨蛋)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_1ddc02a53fc4759fd9004d381a31be62 = L.marker(
+                [25.051548, 121.5547373],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_1ddc02a53fc4759fd9004d381a31be62.bindTooltip(
+                `<div>
+                     南京寧安街口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_0b3941984609929f57c878b4aece3add = L.marker(
+                [25.042558, 121.557568],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_0b3941984609929f57c878b4aece3add.bindTooltip(
+                `<div>
+                     捷運國父紀念館站(光復)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_417daaafd6bdc1d80defa3c496430181 = L.marker(
+                [25.03669, 121.55745],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_417daaafd6bdc1d80defa3c496430181.bindTooltip(
+                `<div>
+                     市民住宅
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_45581d78f5d432b60b2213e17aabf363 = L.marker(
+                [25.034098, 121.5573365],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_45581d78f5d432b60b2213e17aabf363.bindTooltip(
+                `<div>
+                     三張犁
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_9b0abfc94c86b83c658340d86e8a03fc = L.marker(
+                [25.031446, 121.56127],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_9b0abfc94c86b83c658340d86e8a03fc.bindTooltip(
+                `<div>
+                     世貿中心(莊敬)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_d66835587402706e89a5a0a99029d9cd = L.marker(
+                [25.02923, 121.5624103],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_d66835587402706e89a5a0a99029d9cd.bindTooltip(
+                `<div>
+                     景新里
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_078c77752d5eebce4ed84133849083ee = L.marker(
+                [25.028273, 121.5632643],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_078c77752d5eebce4ed84133849083ee.bindTooltip(
+                `<div>
+                     臺北醫學大學
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_8e0141ab29d7a1e885f0953a6f5f3af4 = L.marker(
+                [25.027402, 121.565724],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_8e0141ab29d7a1e885f0953a6f5f3af4.bindTooltip(
+                `<div>
+                     信義國中(莊敬)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_325c197dfc42918b6a5d199651f9fbd8 = L.marker(
+                [25.026231, 121.568554],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_325c197dfc42918b6a5d199651f9fbd8.bindTooltip(
+                `<div>
+                     吳興國小(松仁)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_f35d7e5cd28f0e2bb14e7f46930196d3 = L.marker(
+                [25.024432, 121.569585],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_f35d7e5cd28f0e2bb14e7f46930196d3.bindTooltip(
+                `<div>
+                     松仁路
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_667eb002849b9b969b5e54720525fae3 = L.marker(
+                [25.02453, 121.5695997],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_667eb002849b9b969b5e54720525fae3.bindTooltip(
+                `<div>
+                     松仁路
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_097798b6766f016ff9141e4058280e0e = L.marker(
+                [25.03369, 121.5684464],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_097798b6766f016ff9141e4058280e0e.bindTooltip(
+                `<div>
+                     信義松仁路口(松仁)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_f343ab3b2103a9f6814ff6c00494ffbd = L.marker(
+                [25.035907, 121.5646562],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_f343ab3b2103a9f6814ff6c00494ffbd.bindTooltip(
+                `<div>
+                     市政府(松壽)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_61196fcabdf29f8894077b64da7a20f6 = L.marker(
+                [25.038366, 121.5636251],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_61196fcabdf29f8894077b64da7a20f6.bindTooltip(
+                `<div>
+                     市政府(市府)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_c69342d605927727662b3a0de76d74dd = L.marker(
+                [25.041057, 121.5653493],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_c69342d605927727662b3a0de76d74dd.bindTooltip(
+                `<div>
+                     捷運市政府站
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+
+        function geo_json_c825ba936fc9ea654adf0a58be7a7615_onEachFeature(feature, layer) {
+            layer.on({
+            });
+        };
+        var geo_json_c825ba936fc9ea654adf0a58be7a7615 = L.geoJson(null, {
+                onEachFeature: geo_json_c825ba936fc9ea654adf0a58be7a7615_onEachFeature,
+            
+            ...{
+}
+        });
+
+        function geo_json_c825ba936fc9ea654adf0a58be7a7615_add (data) {
+            geo_json_c825ba936fc9ea654adf0a58be7a7615
+                .addData(data);
+        }
+            geo_json_c825ba936fc9ea654adf0a58be7a7615_add({"features": [{"geometry": {"coordinates": [121.5430453, 24.9753], "type": "Point"}, "id": "0", "properties": {"latitude": 24.9753, "longitude": 121.5430453, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u4e03\u5f35\u7ad9", "\u8eca\u7ad9\u5e8f\u865f": 18, "\u8eca\u7ad9\u7de8\u865f": 2314301100}, "type": "Feature"}, {"geometry": {"coordinates": [121.542795, 24.978161], "type": "Point"}, "id": "1", "properties": {"latitude": 24.978161, "longitude": 121.542795, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u65b0\u5e97\u90f5\u5c40", "\u8eca\u7ad9\u5e8f\u865f": 19, "\u8eca\u7ad9\u7de8\u865f": 2314301700}, "type": "Feature"}, {"geometry": {"coordinates": [121.5418387, 24.981232], "type": "Point"}, "id": "2", "properties": {"latitude": 24.981232, "longitude": 121.5418387, "\u516c\u8eca\u5230\u9054\u6642\u9593": "7\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5927\u576a\u6797", "\u8eca\u7ad9\u5e8f\u865f": 20, "\u8eca\u7ad9\u7de8\u865f": 2314300100}, "type": "Feature"}, {"geometry": {"coordinates": [121.5413983, 24.983344], "type": "Point"}, "id": "3", "properties": {"latitude": 24.983344, "longitude": 121.5413983, "\u516c\u8eca\u5230\u9054\u6642\u9593": "8\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u5927\u576a\u6797\u7ad9", "\u8eca\u7ad9\u5e8f\u865f": 21, "\u8eca\u7ad9\u7de8\u865f": 2314301200}, "type": "Feature"}, {"geometry": {"coordinates": [121.54025, 24.99113], "type": "Point"}, "id": "4", "properties": {"latitude": 24.99113, "longitude": 121.54025, "\u516c\u8eca\u5230\u9054\u6642\u9593": "11\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6eec\u6c5f\u4e2d\u5b78", "\u8eca\u7ad9\u5e8f\u865f": 22, "\u8eca\u7ad9\u7de8\u865f": 1167400300}, "type": "Feature"}, {"geometry": {"coordinates": [121.5407616, 24.992366], "type": "Point"}, "id": "5", "properties": {"latitude": 24.992366, "longitude": 121.5407616, "\u516c\u8eca\u5230\u9054\u6642\u9593": "12\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u666f\u7f8e\u7ad9", "\u8eca\u7ad9\u5e8f\u865f": 23, "\u8eca\u7ad9\u7de8\u865f": 1167000200}, "type": "Feature"}, {"geometry": {"coordinates": [121.5392576, 25.001386], "type": "Point"}, "id": "6", "properties": {"latitude": 25.001386, "longitude": 121.5392576, "\u516c\u8eca\u5230\u9054\u6642\u9593": "3\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u842c\u9686\u7ad9", "\u8eca\u7ad9\u5e8f\u865f": 26, "\u8eca\u7ad9\u7de8\u865f": 1167000300}, "type": "Feature"}, {"geometry": {"coordinates": [121.5387822, 25.003273], "type": "Point"}, "id": "7", "properties": {"latitude": 25.003273, "longitude": 121.5387822, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6b66\u529f\u570b\u5c0f(\u7f85\u65af\u798f)", "\u8eca\u7ad9\u5e8f\u865f": 27, "\u8eca\u7ad9\u7de8\u865f": 1168100100}, "type": "Feature"}, {"geometry": {"coordinates": [121.53901, 25.006894], "type": "Point"}, "id": "8", "properties": {"latitude": 25.006894, "longitude": 121.53901, "\u516c\u8eca\u5230\u9054\u6642\u9593": "6\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5e2b\u5927\u5206\u90e8", "\u8eca\u7ad9\u5e8f\u865f": 28, "\u8eca\u7ad9\u7de8\u865f": 1168100200}, "type": "Feature"}, {"geometry": {"coordinates": [121.5401488, 25.013453], "type": "Point"}, "id": "9", "properties": {"latitude": 25.013453, "longitude": 121.5401488, "\u516c\u8eca\u5230\u9054\u6642\u9593": "3\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u81fa\u7063\u79d1\u6280\u5927\u5b78", "\u8eca\u7ad9\u5e8f\u865f": 30, "\u8eca\u7ad9\u7de8\u865f": 1060700020}, "type": "Feature"}, {"geometry": {"coordinates": [121.5425256, 25.015521], "type": "Point"}, "id": "10", "properties": {"latitude": 25.015521, "longitude": 121.5425256, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u81fa\u5927\u764c\u91ab(\u57fa\u9686\u8def)", "\u8eca\u7ad9\u5e8f\u865f": 31, "\u8eca\u7ad9\u7de8\u865f": 1067200720}, "type": "Feature"}, {"geometry": {"coordinates": [121.5448494, 25.017425], "type": "Point"}, "id": "11", "properties": {"latitude": 25.017425, "longitude": 121.5448494, "\u516c\u8eca\u5230\u9054\u6642\u9593": "5\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u57fa\u9686\u9577\u8208\u8857\u53e3", "\u8eca\u7ad9\u5e8f\u865f": 32, "\u8eca\u7ad9\u7de8\u865f": 1067200320}, "type": "Feature"}, {"geometry": {"coordinates": [121.54746, 25.01963], "type": "Point"}, "id": "12", "properties": {"latitude": 25.01963, "longitude": 121.54746, "\u516c\u8eca\u5230\u9054\u6642\u9593": "6\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u548c\u5e73\u9ad8\u4e2d", "\u8eca\u7ad9\u5e8f\u865f": 33, "\u8eca\u7ad9\u7de8\u865f": 1105200100}, "type": "Feature"}, {"geometry": {"coordinates": [121.5519069, 25.023636], "type": "Point"}, "id": "13", "properties": {"latitude": 25.023636, "longitude": 121.5519069, "\u516c\u8eca\u5230\u9054\u6642\u9593": "9\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u516d\u5f35\u7281\u7ad9(\u57fa\u9686\u8def)", "\u8eca\u7ad9\u5e8f\u865f": 34, "\u8eca\u7ad9\u7de8\u865f": 1067500200}, "type": "Feature"}, {"geometry": {"coordinates": [121.5549231, 25.02628], "type": "Point"}, "id": "14", "properties": {"latitude": 25.02628, "longitude": 121.5549231, "\u516c\u8eca\u5230\u9054\u6642\u9593": "10\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u55ac\u6cbb\u5546\u8077", "\u8eca\u7ad9\u5e8f\u865f": 35, "\u8eca\u7ad9\u7de8\u865f": 1105400100}, "type": "Feature"}, {"geometry": {"coordinates": [121.5601565, 25.033677], "type": "Point"}, "id": "15", "properties": {"latitude": 25.033677, "longitude": 121.5601565, "\u516c\u8eca\u5230\u9054\u6642\u9593": "4\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u4e16\u8cbf\u4e2d\u5fc3(\u57fa\u9686\u8def)", "\u8eca\u7ad9\u5e8f\u865f": 38, "\u8eca\u7ad9\u7de8\u865f": 1105100100}, "type": "Feature"}, {"geometry": {"coordinates": [121.5648932, 25.035836], "type": "Point"}, "id": "16", "properties": {"latitude": 25.035836, "longitude": 121.5648932, "\u516c\u8eca\u5230\u9054\u6642\u9593": "7\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5e02\u653f\u5e9c(\u677e\u58fd)", "\u8eca\u7ad9\u5e8f\u865f": 39, "\u8eca\u7ad9\u7de8\u865f": 1105100320}, "type": "Feature"}, {"geometry": {"coordinates": [121.5655763, 25.03685], "type": "Point"}, "id": "17", "properties": {"latitude": 25.03685, "longitude": 121.5655763, "\u516c\u8eca\u5230\u9054\u6642\u9593": "9\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u5e02\u653f\u5e9c(\u677e\u667a)", "\u8eca\u7ad9\u5e8f\u865f": 40, "\u8eca\u7ad9\u7de8\u865f": 1105100200}, "type": "Feature"}, {"geometry": {"coordinates": [121.5668354, 25.041009], "type": "Point"}, "id": "18", "properties": {"latitude": 25.041009, "longitude": 121.5668354, "\u516c\u8eca\u5230\u9054\u6642\u9593": "11\u5206\u9418", "\u8eca\u7ad9\u540d\u7a31": "\u6377\u904b\u5e02\u653f\u5e9c\u7ad9", "\u8eca\u7ad9\u5e8f\u865f": 41, "\u8eca\u7ad9\u7de8\u865f": 1107100121}, "type": "Feature"}], "type": "FeatureCollection"});
+        geo_json_c825ba936fc9ea654adf0a58be7a7615.setStyle(function(feature) {return feature.properties.style;});
+
+        
+    
+            geo_json_c825ba936fc9ea654adf0a58be7a7615.addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            var marker_f5a0ed5e8f3bf41d685bc72c5f43750c = L.marker(
+                [24.9753, 121.5430453],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_f5a0ed5e8f3bf41d685bc72c5f43750c.bindTooltip(
+                `<div>
+                     捷運七張站
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_3f346892ce396ce7794f2424e9439509 = L.marker(
+                [24.978161, 121.542795],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_3f346892ce396ce7794f2424e9439509.bindTooltip(
+                `<div>
+                     新店郵局
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_13a1a550f45b74a848627b32d32f8d68 = L.marker(
+                [24.981232, 121.5418387],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_13a1a550f45b74a848627b32d32f8d68.bindTooltip(
+                `<div>
+                     大坪林
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_fdf81168b4d112bf97259a4be1c4031f = L.marker(
+                [24.983344, 121.5413983],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_fdf81168b4d112bf97259a4be1c4031f.bindTooltip(
+                `<div>
+                     捷運大坪林站
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_af463433b1fef788bfbe46db002eed2c = L.marker(
+                [24.99113, 121.54025],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_af463433b1fef788bfbe46db002eed2c.bindTooltip(
+                `<div>
+                     滬江中學
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_b940d79d31271488f3de85e2d92bdfd7 = L.marker(
+                [24.992366, 121.5407616],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_b940d79d31271488f3de85e2d92bdfd7.bindTooltip(
+                `<div>
+                     捷運景美站
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_57b319178e8dd5c176e379a18c6e497e = L.marker(
+                [25.001386, 121.5392576],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_57b319178e8dd5c176e379a18c6e497e.bindTooltip(
+                `<div>
+                     捷運萬隆站
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_7786f20780f21f2c1f51454b42375966 = L.marker(
+                [25.003273, 121.5387822],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_7786f20780f21f2c1f51454b42375966.bindTooltip(
+                `<div>
+                     武功國小(羅斯福)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_2ed8f3c24b8c26e8832433b88cc565ac = L.marker(
+                [25.006894, 121.53901],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_2ed8f3c24b8c26e8832433b88cc565ac.bindTooltip(
+                `<div>
+                     師大分部
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_e3ac199dd455a96dc5551ee2afa5fd90 = L.marker(
+                [25.013453, 121.5401488],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_e3ac199dd455a96dc5551ee2afa5fd90.bindTooltip(
+                `<div>
+                     臺灣科技大學
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_88b3aa18bdf08529a57014df170b97c9 = L.marker(
+                [25.015521, 121.5425256],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_88b3aa18bdf08529a57014df170b97c9.bindTooltip(
+                `<div>
+                     臺大癌醫(基隆路)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_2f932f63ec568e3ef8511f70f91dd92a = L.marker(
+                [25.017425, 121.5448494],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_2f932f63ec568e3ef8511f70f91dd92a.bindTooltip(
+                `<div>
+                     基隆長興街口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_a6711b954cd84b8e98f4954d533cf60d = L.marker(
+                [25.01963, 121.54746],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_a6711b954cd84b8e98f4954d533cf60d.bindTooltip(
+                `<div>
+                     和平高中
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_349de502e6cb5903080867a9373b653d = L.marker(
+                [25.023636, 121.5519069],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_349de502e6cb5903080867a9373b653d.bindTooltip(
+                `<div>
+                     捷運六張犁站(基隆路)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_4cd32dc18c2ef031ee8d8d4b577ab399 = L.marker(
+                [25.02628, 121.5549231],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_4cd32dc18c2ef031ee8d8d4b577ab399.bindTooltip(
+                `<div>
+                     喬治商職
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_ffc68df15bcfb3eea5cb87c03e7f700b = L.marker(
+                [25.033677, 121.5601565],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_ffc68df15bcfb3eea5cb87c03e7f700b.bindTooltip(
+                `<div>
+                     世貿中心(基隆路)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_5b6bacfbe77cfd5aae9b9bcc0a6c14c4 = L.marker(
+                [25.035836, 121.5648932],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_5b6bacfbe77cfd5aae9b9bcc0a6c14c4.bindTooltip(
+                `<div>
+                     市政府(松壽)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_934d25b09599510923d284580b3e3817 = L.marker(
+                [25.03685, 121.5655763],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_934d25b09599510923d284580b3e3817.bindTooltip(
+                `<div>
+                     市政府(松智)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_1a2e1ebe4cbea60dc7e95cc247e896fe = L.marker(
+                [25.041009, 121.5668354],
+                {
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+        
+    
+            marker_1a2e1ebe4cbea60dc7e95cc247e896fe.bindTooltip(
+                `<div>
+                     捷運市政府站
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var layer_control_71d694cc2f1bfdb349db6855be7135e3_layers = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_3cac4969878003c2513b56755e7c04c9,
+                },
+                overlays :  {
+                    "bus_route_0161000900" : geo_json_96065b541847049bc8adb8eef76d4997,
+                    "bus_route_0161001500" : geo_json_c825ba936fc9ea654adf0a58be7a7615,
+                },
+            };
+            let layer_control_71d694cc2f1bfdb349db6855be7135e3 = L.control.layers(
+                layer_control_71d694cc2f1bfdb349db6855be7135e3_layers.base_layers,
+                layer_control_71d694cc2f1bfdb349db6855be7135e3_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_c884e3b726a71bcd3647ecaea4a29fe4);
+
+        
+</script>
+</html>
