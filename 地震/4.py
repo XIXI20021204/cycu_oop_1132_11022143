@@ -1,165 +1,115 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ===== Parameter Setup =====
-W = 50   # Weight [k]
-g = 386.1  # Gravitational acceleration [in/s²]
-m = W / g  # Mass [k·s²/in]
-k = 100  # Spring stiffness [k/in]
-xi = 0.12  # Damping ratio
-omega_n = np.sqrt(k / m)   # Natural frequency [rad/s]
-c = 2 * m * omega_n * xi   # Damping coefficient [k·s/in]
-ẍ_g_peak = 0.25 * g   # Peak ground acceleration
-dt = 0.01  # Time step [s]
-num_steps = 6   # First 6 time steps
-t = np.arange(0, num_steps * dt, dt)   # Time vector
-ẍ_g_t = ẍ_g_peak * np.sin(np.pi * t / (num_steps * dt))   # Assumed ground acceleration
+# ===== 參數設定 =====
+W = 50  # 重量 [k]
+g = 386.1 # 重力加速度 [in/s²]
+m = W / g # 質量 [k·s²/in]
+k = 100 # 彈簧剛度 [k/in]
+xi = 0.12 # 阻尼比
+omega_n = np.sqrt(k / m) # 自然頻率 [rad/s]
+c = 2 * m * omega_n * xi # 阻尼係數 [k·s/in]
+ag_peak = 0.25 * g # 峰值地面加速度
+dt = 0.01 # 時間步長 [s]
+n_steps = 6 # 前 6 個時間步
+t = np.arange(0, n_steps * dt, dt) # 時間向量
+ag_t = ag_peak * np.sin(np.pi * t / (n_steps * dt)) # 假設地面加速度
 
-# ===== Initialize arrays =====
-def init_arrays(num_steps):
-    return (
-        np.zeros(num_steps),   # displacement x
-        np.zeros(num_steps),   # velocity ẋ
-        np.zeros(num_steps),   # acceleration ẍ
-        np.zeros(num_steps),   # effective force F_eff
-    )
+# ===== 初始化陣列 =====
+def init_arr(n):
+    return np.zeros(n), np.zeros(n), np.zeros(n), np.zeros(n) # x, x_dot, x_ddot, F_eff
 
-# ===== Wilson-θ Method =====
-def wilson_theta_method(x, x_dot, x_ddot, F_eff, m, c, k, dt, theta, num_steps, ẍ_g_t):
+# ===== Wilson-θ 法 =====
+def wilson_theta(x, xd, xdd, F_eff, m, c, k, dt, theta, n, ag_t):
     beta = 1 + xi * omega_n * theta * dt + (1/6) * omega_n**2 * theta**2 * dt**2
     gamma = xi * omega_n * theta * dt + (1/3) * omega_n**2 * theta**2 * dt**2
-    Aw = np.zeros((3, 3))
-    Bw = np.zeros((3, 1))
-
-    Aw[0, 0] = (-omega_n**2 * theta**2 * dt**2 / (6 * beta))
-    Aw[0, 1] = (dt - xi * omega_n * theta**2 * dt**2 / 3 - omega_n**2 * theta**2 * dt**3 / 6) / beta
-    Aw[0, 2] = (1 - theta - gamma) * theta**2 * dt**2 / (6 * beta)
-    Aw[1, 0] = (-omega_n**2 * theta * dt / beta)
-    Aw[1, 1] = (1 - 2 * xi * omega_n * theta * dt - omega_n**2 * theta * dt**2) / beta
-    Aw[1, 2] = (beta * theta - theta - gamma) * dt / (beta * theta)
-    Aw[2, 0] = -omega_n**2 * theta / beta
-    Aw[2, 1] = (-2 * xi * omega_n * theta - omega_n**2 * theta * dt) / beta
-    Aw[2, 2] = (-gamma - theta + 1) / beta
-
-    Bw[0, 0] = theta**2 * dt**2 / (6 * m * beta)
-    Bw[1, 0] = theta * dt / (2 * m * beta)
-    Bw[2, 0] = theta / (m * beta)
-
+    Aw = np.array([
+        [-omega_n**2 * theta**2 * dt**2 / (6 * beta), (dt - xi * omega_n * theta**2 * dt**2 / 3 - omega_n**2 * theta**2 * dt**3 / 6) / beta, (1 - theta - gamma) * theta**2 * dt**2 / (6 * beta)],
+        [-omega_n**2 * theta * dt / beta, (1 - 2 * xi * omega_n * theta * dt - omega_n**2 * theta * dt**2) / beta, (beta * theta - theta - gamma) * dt / (beta * theta)],
+        [-omega_n**2 * theta / beta, (-2 * xi * omega_n * theta - omega_n**2 * theta * dt) / beta, (-gamma - theta + 1) / beta]
+    ])
+    Bw = np.array([[theta**2 * dt**2 / (6 * m * beta)], [theta * dt / (2 * m * beta)], [theta / (m * beta)]])
     Xj = np.zeros((3, 1))
     Xj1 = np.zeros((3, 1))
+    for i in range(1, n):
+        F_eff[i] = -m * ag_t[i]
+        Xj[:, 0] = [x[i-1], xd[i-1], xdd[i-1]]
+        Xj1 = Aw @ Xj + Bw * F_eff[i]
+        x[i], xd[i], xdd[i] = Xj1[:, 0]
+    return x, xd, xdd, F_eff
 
-    for i in range(1, num_steps):
-        F_eff[i] = -m * ẍ_g_t[i]
-        Xj[0, 0] = x[i-1]
-        Xj[1, 0] = x_dot[i-1]
-        Xj[2, 0] = x_ddot[i-1]
-
-        Xj1 = np.dot(Aw, Xj) + Bw * F_eff[i]
-
-        x[i] = Xj1[0, 0]
-        x_dot[i] = Xj1[1, 0]
-        x_ddot[i] = Xj1[2, 0]
-
-    return x, x_dot, x_ddot, F_eff
-
-# ===== Central Difference Method =====
-def central_difference_method(x, x_dot, x_ddot, F_eff, m, c, k, dt, num_steps, ẍ_g_t):
+# ===== 中央差分法 =====
+def central_diff(x, xd, xdd, F_eff, m, c, k, dt, n, ag_t):
     a = m / dt**2 - c / (2 * dt)
     b = k - 2 * m / dt**2
     k_hat = m / dt**2 + c / (2 * dt)
-
-    x[0] = 0
-    x_dot[0] = 0
-    x_ddot[0] = (F_eff[0] - c * x_dot[0] - k * x[0]) / m
-    x_prev = x[0] - dt * x_dot[0] + (dt**2 / 2) * x_ddot[0]  # x_{-1}
-
-    for i in range(1, num_steps):
-        F_eff[i] = -m * ẍ_g_t[i]
+    x[0] = xd[0] = 0
+    xdd[0] = (F_eff[0] - c * xd[0] - k * x[0]) / m
+    x_prev = x[0] - dt * xd[0] + (dt**2 / 2) * xdd[0]
+    for i in range(1, n):
+        F_eff[i] = -m * ag_t[i]
         F_hat = F_eff[i] - a * x_prev - b * x[i-1]
         x_next = F_hat / k_hat
-
         x_prev = x[i-1]
         x[i] = x_next
-        if i < num_steps - 1:
-            x_dot[i] = (x[i+1] - x_prev) / (2 * dt)
-        x_ddot[i] = (x_next - 2 * x[i-1] + x_prev) / dt**2
-    return x, x_dot, x_ddot, F_eff
+        if i < n - 1:
+            xd[i] = (x[i+1] - x_prev) / (2 * dt)
+        xdd[i] = (x_next - 2 * x[i-1] + x_prev) / dt**2
+    return x, xd, xdd, F_eff
 
-# ===== Average Acceleration Method =====
-def average_acceleration_method(x, x_dot, x_ddot, F_eff, m, c, k, dt, num_steps, ẍ_g_t):
-    for i in range(1, num_steps):
-        F_eff[i] = -m * ẍ_g_t[i]
-        x_ddot[i] = (F_eff[i] - c * x_dot[i-1] - k * x[i-1]) / m
-        x_dot[i] = x_dot[i-1] + dt * (x_ddot[i] + x_ddot[i-1]) / 2
-        x[i] = x[i-1] + dt * x_dot[i-1] + (dt**2 / 4) * x_ddot[i-1] + (dt**2 / 4) * x_ddot[i]
-    return x, x_dot, x_ddot, F_eff
+# ===== 平均加速度法 =====
+def avg_accel(x, xd, xdd, F_eff, m, c, k, dt, n, ag_t):
+    for i in range(1, n):
+        F_eff[i] = -m * ag_t[i]
+        xdd[i] = (F_eff[i] - c * xd[i-1] - k * x[i-1]) / m
+        xd[i] = xd[i-1] + dt * (xdd[i] + xdd[i-1]) / 2
+        x[i] = x[i-1] + dt * xd[i-1] + (dt**2 / 4) * xdd[i-1] + (dt**2 / 4) * xdd[i]
+    return x, xd, xdd, F_eff
 
-# ===== Linear Acceleration Method =====
-def linear_acceleration_method(x, x_dot, x_ddot, F_eff, m, c, k, dt, num_steps, ẍ_g_t):
-    for i in range(1, num_steps):
-        F_eff[i] = -m * ẍ_g_t[i]
-        x_ddot[i] = (F_eff[i] - c * x_dot[i-1] - k * x[i-1]) / m
-        x_dot[i] = x_dot[i-1] + dt * x_ddot[i-1] + (dt / 2) * (x_ddot[i] - x_ddot[i-1])
-        x[i] = x[i-1] + dt * x_dot[i-1] + (dt**2 / 6) * (x_ddot[i] - x_ddot[i-1]) + (dt**2 / 2) * x_ddot[i-1]
-    return x, x_dot, x_ddot, F_eff
+# ===== 線性加速度法 =====
+def linear_accel(x, xd, xdd, F_eff, m, c, k, dt, n, ag_t):
+    for i in range(1, n):
+        F_eff[i] = -m * ag_t[i]
+        xdd[i] = (F_eff[i] - c * xd[i-1] - k * x[i-1]) / m
+        xd[i] = xd[i-1] + dt * xdd[i-1] + (dt / 2) * (xdd[i] - xdd[i-1])
+        x[i] = x[i-1] + dt * xd[i-1] + (dt**2 / 6) * (xdd[i] - xdd[i-1]) + (dt**2 / 2) * xdd[i-1]
+    return x, xd, xdd, F_eff
 
-# ===== Main Calculation =====
-
-# Initialize arrays
-x_w, x_dot_w, x_ddot_w, F_eff_w = init_arrays(num_steps)
-x_c, x_dot_c, x_ddot_c, F_eff_c = init_arrays(num_steps)
-x_avg, x_dot_avg, x_ddot_avg, F_eff_avg = init_arrays(num_steps)
-x_lin, x_dot_lin, x_ddot_lin, F_eff_lin = init_arrays(num_steps)
+# ===== 主要計算 =====
+xw, xdw, xddw, Feffw = init_arr(n_steps)
+xc, xdc, xddc, Feffc = init_arr(n_steps)
+xavg, xdavg, xddavg, Feffavg = init_arr(n_steps)
+xlin, xdlin, xddlin, Fefflin = init_arr(n_steps)
 
 theta = 1.4
 
-# Perform calculations
-x_w, x_dot_w, x_ddot_w, F_eff_w = wilson_theta_method(x_w, x_dot_w, x_ddot_w, F_eff_w, m, c, k, dt, theta, num_steps, ẍ_g_t)
-x_c, x_dot_c, x_ddot_c, F_eff_c = central_difference_method(x_c, x_dot_c, x_ddot_c, F_eff_c, m, c, k, dt, num_steps, ẍ_g_t)
-x_avg, x_dot_avg, x_ddot_avg, F_eff_avg = average_acceleration_method(x_avg, x_dot_avg, x_ddot_avg, F_eff_avg, m, c, k, dt, num_steps, ẍ_g_t)
-x_lin, x_dot_lin, x_ddot_lin, F_eff_lin = linear_acceleration_method(x_lin, x_dot_lin, x_ddot_lin, F_eff_lin, m, c, k, dt, num_steps, ẍ_g_t)
+xw, xdw, xddw, Feffw = wilson_theta(xw, xdw, xddw, Feffw, m, c, k, dt, theta, n_steps, ag_t)
+xc, xdc, xddc, Feffc = central_diff(xc, xdc, xddc, Feffc, m, c, k, dt, n_steps, ag_t)
+xavg, xdavg, xddavg, Feffavg = avg_accel(xavg, xdavg, xddavg, Feffavg, m, c, k, dt, n_steps, ag_t)
+xlin, xdlin, xddlin, Fefflin = linear_accel(xlin, xdlin, xddlin, Fefflin, m, c, k, dt, n_steps, ag_t)
 
-
-# ===== Plot Results =====
+# ===== 繪製結果 =====
 fig, axs = plt.subplots(4, 1, figsize=(10, 14))
+results = [
+    (t, xw, xc, xavg, xlin, 'Displacement x(t) [in]'),
+    (t, xdw, xdc, xdavg, xdlin, 'Velocity ẋ(t) [in/s]'),
+    (t, xddw, xddc, xddavg, xddlin, 'Acceleration ẍ(t) [in/s²]'),
+    (t, Feffw, Feffc, Feffavg, Fefflin, 'Effective Force F_eff(t) [k]')
+]
+labels = ['Wilson θ', 'Central Difference', 'Average Acceleration', 'Linear Acceleration']
+linestyles = ['-', '--', '-.', ':']
 
-# Displacement
-axs[0].plot(t, x_w, label='Wilson θ')
-axs[0].plot(t, x_c, '--', label='Central Difference')
-axs[0].plot(t, x_avg, '-.', label='Average Acceleration')
-axs[0].plot(t, x_lin, ':', label='Linear Acceleration')
-axs[0].set_ylabel('Displacement x(t) [in]')
-axs[0].legend()
-axs[0].grid()
-
-# Velocity
-axs[1].plot(t, x_dot_w, label='Wilson θ')
-axs[1].plot(t, x_dot_c, '--', label='Central Difference')
-axs[1].plot(t, x_dot_avg, '-.', label='Average Acceleration')
-axs[1].plot(t, x_dot_lin, ':', label='Linear Acceleration')
-axs[1].set_ylabel('Velocity ẋ(t) [in/s]')
-axs[1].legend()
-axs[1].grid()
-
-# Acceleration
-axs[2].plot(t, x_ddot_w, label='Wilson θ')
-axs[2].plot(t, x_ddot_c, '--', label='Central Difference')
-axs[2].plot(t, x_ddot_avg, '-.', label='Average Acceleration')
-axs[2].plot(t, x_ddot_lin, ':', label='Linear Acceleration')
-axs[2].set_ylabel('Acceleration ẍ(t) [in/s²]')
-axs[2].legend()
-axs[2].grid()
-
-# Effective Force
-axs[3].plot(t, F_eff_w, label='Wilson θ')
-axs[3].plot(t, F_eff_c, '--', label='Central Difference')
-axs[3].plot(t, F_eff_avg, '-.', label='Average Acceleration')
-axs[3].plot(t, F_eff_lin, ':', label='Linear Acceleration')
-axs[3].set_ylabel('Effective Force F_eff(t) [k]')
-axs[3].set_xlabel('Time t [s]')
-axs[3].legend()
-axs[3].grid()
+for i, (time, w, c, avg, lin, ylabel) in enumerate(results):
+    axs[i].plot(time, w, label=labels[0], linestyle=linestyles[0])
+    axs[i].plot(time, c, label=labels[1], linestyle=linestyles[1])
+    axs[i].plot(time, avg, label=labels[2], linestyle=linestyles[2])
+    axs[i].plot(time, lin, label=labels[3], linestyle=linestyles[3])
+    axs[i].set_ylabel(ylabel)
+    if i == 3:
+        axs[i].set_xlabel('Time t [s]')
+    axs[i].legend()
+    axs[i].grid()
 
 plt.tight_layout()
-plt.savefig('numerical_methods_comparison.jpg') # 在此行儲存為 JPG 檔案
+plt.savefig('numerical_methods_comparison_simplified.jpg')
 plt.show()
