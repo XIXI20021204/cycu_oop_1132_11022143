@@ -1,117 +1,243 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Given parameters
+# ===== Parameter Setup =====
 W = 50  # Weight [k]
 g = 386.1  # Gravitational acceleration [in/s²]
 m = W / g  # Mass [k·s²/in]
 k = 100  # Spring stiffness [k/in]
-xi = 0.12  # Damping ratio
-c = 2 * m * np.sqrt(k / m) * xi  # Damping constant [k·s/in]
-xg_peak = 0.25 * g  # Peak ground acceleration [in/s²]
+ζ = 0.12  # Damping ratio
+c = 2 * m * np.sqrt(k / m) * ζ  # Damping coefficient [k·s/in]
+ẍ_g_peak = 0.25 * g  # Peak ground acceleration
 
-# Time parameters
 dt = 0.01  # Time step [s]
-num_steps = 6  # Compute the first six time steps
-t = np.arange(0, num_steps * dt, dt)  # Time sequence
-
-# Ground acceleration model (using a simple trigonometric approximation)
-xg_t = xg_peak * np.sin(np.pi * t / (num_steps * dt))
+t0 = 0.75  # Duration of pulse [s]
+t_full = np.arange(0, 2 * t0 + dt, dt)  # Full time vector
+t_plot = np.arange(0, 0.05 + dt, dt) # Time vector for plotting
+indices_plot = np.where(t_full <= 0.05)[0]
+t = t_full[indices_plot]
+ẍ_g_t = np.where(t <= t0, ẍ_g_peak, -ẍ_g_peak)
 
 # Initialize arrays
-x_avg = np.zeros(num_steps)
-x_lin = np.zeros(num_steps)
-x_wilson = np.zeros(num_steps)
-x_center = np.zeros(num_steps)
-x_dot_avg = np.zeros(num_steps)
-x_dot_lin = np.zeros(num_steps)
-x_dot_wilson = np.zeros(num_steps)
-x_dot_center = np.zeros(num_steps)
-x_ddot_avg = np.zeros(num_steps)
-x_ddot_lin = np.zeros(num_steps)
-x_ddot_wilson = np.zeros(num_steps)
-x_ddot_center = np.zeros(num_steps)
-F_eff = np.zeros(num_steps)  # Renamed from F_dy
+def init_arrays(num_steps):
+    return (
+        np.zeros(num_steps),  # displacement x
+        np.zeros(num_steps),  # velocity ẋ
+        np.zeros(num_steps),  # acceleration ẍ
+        np.zeros(num_steps),  # effective force F_eff
+    )
 
-# Wilson θ method (θ = 1.4)
+num_steps = len(t)
+
+# ===== Wilson-θ Method =====
 theta = 1.4
-a1 = (theta / dt**2) * m + (theta / dt) * c
-a2 = k
-a3 = (theta / dt**2) * m
-a4 = (theta / dt) * c
-a5 = m / (theta * dt**2)
-a6 = c / (theta * dt)
+ω_n = np.sqrt(k / m)
+x_w, ẋ_w, ẍ_w, F_eff_w = init_arrays(num_steps)
+x_w[0] = 0
+ẋ_w[0] = 0
+ẍ_w[0] = (-c * ẋ_w[0] - k * x_w[0] - m * ẍ_g_t[0]) / m
+for i in range(num_steps - 1):
+    F_eff_w[i] = -m * ẍ_g_t[i]
+    K_hat = k + (c * theta * dt / 2) + (m * 4 / (theta * dt)**2)
+    ΔF_hat = (F_eff_w[i+1] - F_eff_w[i]) + m * (4 / (theta * dt) * ẋ_w[i] + 2 * ẍ_w[i]) + c * (theta * dt / 2 * ẍ_w[i])
+    Δx = ΔF_hat / K_hat
+    ẍ_w[i+1] = (6 / (theta * dt)**2) * Δx - (6 / (theta * dt)) * ẋ_w[i] + (1 - 3 / theta) * ẍ_w[i]
+    ẋ_w[i+1] = ẋ_w[i] + (theta * dt / 2) * (ẍ_w[i] + ẍ_w[i+1])
+    x_w[i+1] = x_w[i] + theta * dt * ẋ_w[i] + (theta * dt)**2 / 6 * (2 * ẍ_w[i] + ẍ_w[i+1])
 
-# Initialize the first values, crucial for the central difference method
-x_center[0] = 0  # Initial displacement
-x_dot_center[0] = 0  # Initial velocity
-if num_steps > 1:
-    x_center[1] = x_center[0] + dt * x_dot_center[0] + (dt**2 / 2) * (-xg_t[0] - (c/m)*x_dot_center[0] - (k/m)*x_center[0])
-    x_ddot_center[0] = (-xg_t[0] - (c/m)*x_dot_center[0] - (k/m)*x_center[0])
+# ===== Central Difference Method =====
+x_c, ẋ_c, ẍ_c, F_eff_c = init_arrays(num_steps)
+x_c[0] = 0
+ẋ_c[0] = 0
+if dt > 0:
+    x_c[1] = x_c[0] + dt * ẋ_c[0] + (dt**2 / 2) * ((-c * ẋ_c[0] - k * x_c[0] - m * ẍ_g_t[0]) / m)
+else:
+    x_c[1] = 0
+for i in range(1, num_steps - 1):
+    F_eff_c[i] = -m * ẍ_g_t[i]
+    ẍ_c[i] = (F_eff_c[i] - c * (x_c[i] - x_c[i-2]) / (2 * dt) - k * x_c[i-1]) / m
+    x_c[i+1] = 2 * x_c[i] - x_c[i-1] + dt**2 * ẍ_c[i]
+    ẋ_c[i] = (x_c[i+1] - x_c[i-1]) / (2 * dt)
+if num_steps > 2:
+    ẋ_c[-1] = (x_c[-1] - x_c[-3]) / (2 * dt)
+    ẍ_c[-1] = (F_eff_c[-1] - c * (x_c[-1] - x_c[-3]) / (2 * dt) - k * x_c[-2]) / m
 
-# Loop to compute the first six time steps
-for i in range(1, num_steps):
-    F_eff[i] = -m * xg_t[i]  # Compute effective force
-    F_eff[i] -= c * x_dot_avg[i-1] + k * x_avg[i-1]  # Dynamic reaction force
+# ===== Average Acceleration Method =====
+x_avg, ẋ_avg, ẍ_avg, F_eff_avg = init_arrays(num_steps)
+x_avg[0] = 0
+ẋ_avg[0] = 0
+ẍ_avg[0] = (-c * ẋ_avg[0] - k * x_avg[0] - m * ẍ_g_t[0]) / m
+for i in range(num_steps - 1):
+    F_eff_avg[i] = -m * ẍ_g_t[i]
+    K_eff = k + c / (2 * dt) + m / dt**2
+    ΔF = F_eff_avg[i+1] - F_eff_avg[i] + m * (1 / dt * ẋ_avg[i] + 0.5 * ẍ_avg[i]) + c * 0.5 * ẍ_avg[i] * dt
+    Δx = ΔF / K_eff
+    Δẍ = Δx * 2 / dt**2 - ẍ_avg[i]
+    ẋ_avg[i+1] = ẋ_avg[i] + dt / 2 * (ẍ_avg[i] + ẍ_avg[i+1])
+    x_avg[i+1] = x_avg[i] + dt * ẋ_avg[i] + dt**2 / 4 * (ẍ_avg[i] + ẍ_avg[i+1])
+    ẍ_avg[i+1] = ẍ_avg[i] + Δẍ
 
-    # Average acceleration method
-    x_ddot_avg[i] = F_eff[i] / m
-    x_dot_avg[i] = x_dot_avg[i-1] + dt * (x_ddot_avg[i] + x_ddot_avg[i-1]) / 2
-    x_avg[i] = x_avg[i-1] + dt * x_dot_avg[i-1] + (dt**2 / 4) * x_ddot_avg[i-1] + (dt**2 / 4) * x_ddot_avg[i]
+# ===== Linear Acceleration Method =====
+x_lin, ẋ_lin, ẍ_lin, F_eff_lin = init_arrays(num_steps)
+x_lin[0] = 0
+ẋ_lin[0] = 0
+ẍ_lin[0] = (-c * ẋ_lin[0] - k * x_lin[0] - m * ẍ_g_t[0]) / m
+for i in range(num_steps - 1):
+    F_eff_lin[i] = -m * ẍ_g_t[i]
+    K_eff = k + c / dt + m / dt**2
+    ΔF = F_eff_lin[i+1] - F_eff_lin[i] + m * (1 / dt * ẋ_lin[i] + 0.5 * ẍ_lin[i]) + c * 0.5 * ẍ_lin[i] * dt
+    Δx = ΔF / K_eff
+    Δẍ = Δx * 2 / dt**2 - ẍ_lin[i]
+    ẋ_lin[i+1] = ẋ_lin[i] + dt / 2 * (ẍ_lin[i] + ẍ_lin[i+1])
+    x_lin[i+1] = x_lin[i] + dt * ẋ_lin[i] + dt**2 / 6 * (2 * ẍ_lin[i] + ẍ_lin[i+1])
+    ẍ_lin[i+1] = ẍ_lin[i] + Δẍ
 
-    # Linear acceleration method
-    x_ddot_lin[i] = F_eff[i] / m
-    x_dot_lin[i] = x_dot_lin[i-1] + dt * ((x_ddot_lin[i] + x_ddot_lin[i-1]) / 2)
-    x_lin[i] = x_lin[i-1] + dt * x_dot_lin[i-1] + (dt**2 / 2) * ((1/2) * x_ddot_lin[i-1] + (1/2) * x_ddot_lin[i])
+# ===== Plot Results =====
+fig, axs = plt.subplots(4, 1, figsize=(10, 14))
 
-    # Wilson θ method
-    delta_F = F_eff[i] - F_eff[i-1]
-    x_ddot_wilson[i] = (a5 * delta_F - a6 * x_dot_wilson[i-1] - x_wilson[i-1]) / (1 + a5)
-    x_dot_wilson[i] = x_dot_wilson[i-1] + dt * ((1 - 1/theta) * x_ddot_wilson[i-1] + (1/theta) * x_ddot_wilson[i])
-    x_wilson[i] = x_wilson[i-1] + dt * x_dot_wilson[i-1] + (dt**2 / 2) * ((1 - 2/theta) * x_ddot_wilson[i-1] + (2/theta) * x_ddot_wilson[i])
-
-    # Central difference method
-    if i > 1:
-        x_ddot_center[i-1] = (F_eff[i-1] + m * xg_t[i-1] - c * x_dot_center[i-1] - k * x_center[i-1]) / m
-        x_center[i] = (F_eff[i] + m * xg_t[i] + (m/dt**2)*x_center[i-2] - c*(x_center[i-1] - x_center[i-2])/(2*dt)) / (m/dt**2 + c/(2*dt) + k)
-        x_dot_center[i] = (x_center[i] - x_center[i-1]) / dt
-
-# Correct the last acceleration for the central difference method
-if num_steps > 1:
-    x_ddot_center[-1] = (F_eff[-1] + m * xg_t[-1] - c * x_dot_center[-1] - k * x_center[-1]) / m
-
-# Plot results
-fig, axs = plt.subplots(4, 1, figsize=(8, 12))
-
-axs[0].plot(t, F_eff, label=r'$F_{eff}(t)$', color='b')  # Updated label
-axs[0].set_ylabel("Effective Force (k)")
+# Displacement
+axs[0].plot(t, x_w, label='Wilson θ')
+axs[0].set_ylabel('Displacement x(t) [in]')
+axs[0].set_xlabel('Time t [s]')
+axs[0].set_xlim(0, 0.05)
 axs[0].legend()
 axs[0].grid()
 
-axs[1].plot(t, x_avg, label="Average Acceleration", color='g')
-axs[1].plot(t, x_lin, label="Linear Acceleration", color='c')
-axs[1].plot(t, x_wilson, label="Wilson θ", color='m')
-axs[1].plot(t, x_center, label="Central Difference", linestyle="dashed", color='r')
-axs[1].set_ylabel("Displacement (in)")
+# Velocity
+axs[1].plot(t, ẋ_w, label='Wilson θ')
+axs[1].set_ylabel('Velocity ẋ(t) [in/s]')
+axs[1].set_xlabel('Time t [s]')
+axs[1].set_xlim(0, 0.05)
 axs[1].legend()
 axs[1].grid()
 
-axs[2].plot(t, x_dot_avg, label="Average Acceleration", color='g')
-axs[2].plot(t, x_dot_lin, label="Linear Acceleration", color='c')
-axs[2].plot(t, x_dot_wilson, label="Wilson θ", color='m')
-axs[2].plot(t, x_dot_center, label="Central Difference", linestyle="dashed", color='r')
-axs[2].set_ylabel("Velocity (in/s)")
+# Acceleration
+axs[2].plot(t, ẍ_w, label='Wilson θ')
+axs[2].set_ylabel('Acceleration ẍ(t) [in/s²]')
+axs[2].set_xlabel('Time t [s]')
+axs[2].set_xlim(0, 0.05)
 axs[2].legend()
 axs[2].grid()
 
-axs[3].plot(t, x_ddot_avg, label="Average Acceleration", color='g')
-axs[3].plot(t, x_ddot_lin, label="Linear Acceleration", color='c')
-axs[3].plot(t, x_ddot_wilson, label="Wilson θ", color='m')
-axs[3].plot(t, x_ddot_center, label="Central Difference", linestyle="dashed", color='r')
-axs[3].set_ylabel("Acceleration (in/s²)")
-axs[3].set_xlabel("Time (s)")
+# Effective Force (-m * acceleration)
+axs[3].plot(t, -m * ẍ_w, label='Wilson θ')
+axs[3].set_ylabel('Effective Force -m*ẍ(t) [k]')
+axs[3].set_xlabel('Time t [s]')
+axs[3].set_xlim(0, 0.05)
 axs[3].legend()
 axs[3].grid()
 
 plt.tight_layout()
 plt.show()
+
+# ===== Plot Results - Separate Figures =====
+fig_separate, axs_separate = plt.subplots(4, 1, figsize=(10, 14))
+
+# Displacement
+axs_separate[0].plot(t, x_w, label='Wilson θ')
+axs_separate[0].set_ylabel('Displacement x(t) [in]')
+axs_separate[0].set_xlabel('Time t [s]')
+axs_separate[0].set_xlim(0, 0.05)
+axs_separate[0].legend()
+axs_separate[0].grid()
+
+axs_separate[1].plot(t[1:], x_c[1:], label='Central Difference')
+axs_separate[1].set_ylabel('Displacement x(t) [in]')
+axs_separate[1].set_xlabel('Time t [s]')
+axs_separate[1].set_xlim(0, 0.05)
+axs_separate[1].legend()
+axs_separate[1].grid()
+
+axs_separate[2].plot(t, x_avg, label='Average Acceleration')
+axs_separate[2].set_ylabel('Displacement x(t) [in]')
+axs_separate[2].set_xlabel('Time t [s]')
+axs_separate[2].set_xlim(0, 0.05)
+axs_separate[2].legend()
+axs_separate[2].grid()
+
+axs_separate[3].plot(t, x_lin, label='Linear Acceleration')
+axs_separate[3].set_ylabel('Displacement x(t) [in]')
+axs_separate[3].set_xlabel('Time t [s]')
+axs_separate[3].set_xlim(0, 0.05)
+axs_separate[3].legend()
+axs_separate[3].grid()
+
+plt.tight_layout()
+plt.show()
+
+fig_separate_v, axs_separate_v = plt.subplots(4, 1, figsize=(10, 14))
+
+# Velocity
+axs_separate_v[0].plot(t, ẋ_w, label='Wilson θ')
+axs_separate_v[0].set_ylabel('Velocity ẋ(t) [in/s]')
+axs_separate_v[0].set_xlabel('Time t [s]')
+axs_separate_v[0].set_xlim(0, 0.05)
+axs_separate_v[0].legend()
+axs_separate_v[0].grid()
+
+axs_separate_v[1].plot(t[1:-1], ẋ_c[1:-1], label='Central Difference')
+axs_separate_v[1].set_ylabel('Velocity ẋ(t) [in/s]')
+axs_separate_v[1].set_xlabel('Time t [s]')
+axs_separate_v[1].set_xlim(0, 0.05)
+axs_separate_v[1].legend()
+axs_separate_v[1].grid()
+
+axs_separate_v[2].plot(t, ẋ_avg, label='Average Acceleration')
+axs_separate_v[2].set_ylabel('Velocity ẋ(t) [in/s]')
+axs_separate_v[2].set_xlabel('Time t [s]')
+axs_separate_v[2].set_xlim(0, 0.05)
+axs_separate_v[2].legend()
+axs_separate_v[2].grid()
+
+axs_separate_v[3].plot(t, ẋ_lin, label='Linear Acceleration')
+axs_separate_v[3].set_ylabel('Velocity ẋ(t) [in/s]')
+axs_separate_v[3].set_xlabel('Time t [s]')
+axs_separate_v[3].set_xlim(0, 0.05)
+axs_separate_v[3].legend()
+axs_separate_v[3].grid()
+
+plt.tight_layout()
+plt.show()
+
+fig_separate_a, axs_separate_a = plt.subplots(4, 1, figsize=(10, 14))
+
+# Acceleration
+axs_separate_a[0].plot(t, ẍ_w, label='Wilson θ')
+axs_separate_a[0].set_ylabel('Acceleration ẍ(t) [in/s²]')
+axs_separate_a[0].set_xlabel('Time t [s]')
+axs_separate_a[0].set_xlim(0, 0.05)
+axs_separate_a[0].legend()
+axs_separate_a[0].grid()
+
+axs_separate_a[1].plot(t[1:-1], ẍ_c[1:-1], label='Central Difference')
+axs_separate_a[1].set_ylabel('Acceleration ẍ(t) [in/s²]')
+axs_separate_a[1].set_xlabel('Time t [s]')
+axs_separate_a[1].set_xlim(0, 0.05)
+axs_separate_a[1].legend()
+axs_separate_a[1].grid()
+
+axs_separate_a[2].plot(t, ẍ_avg, label='Average Acceleration')
+axs_separate_a[2].set_ylabel('Acceleration ẍ(t) [in/s²]')
+axs_separate_a[2].set_xlabel('Time t [s]')
+axs_separate_a[2].set_xlim(0, 0.05)
+axs_separate_a[2].legend()
+axs_separate_a[2].grid()
+
+axs_separate_a[3].plot(t, ẍ_lin, label='Linear Acceleration')
+axs_separate_a[3].set_ylabel('Acceleration ẍ(t) [in/s²]')
+axs_separate_a[3].set_xlabel('Time t [s]')
+axs_separate_a[3].set_xlim(0, 0.05)
+axs_separate_a[3].legend()
+axs_separate_a[3].grid()
+
+plt.tight_layout()
+plt.show()
+
+fig_separate_f, axs_separate_f = plt.subplots(4, 1, figsize=(10, 14))
+
+# Effective Force (-m * acceleration)
+axs_separate_f[0].plot(t, -m * ẍ_w, label='Wilson θ')
+axs_separate_f[0].set_ylabel('Effective Force -m*ẍ(t) [k]')
+axs_separate_f[0].set_xlabel('Time t [s]')
+axs_separate_f[0].set_xlim(0, 0.05)
+axs_separate_f[0].legend()
