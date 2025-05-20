@@ -70,14 +70,3 @@ class BusRouteInfo:
         for stop in stops:
             print(f"{stop[0]}, {stop[1]}, {stop[2]}, {stop[3]}, {stop[4]}, {stop[5]}")
 
----
-
-## 如何使用新的 `bus_info` 函数
-
-现在，你可以在呼叫 `bus_info` 函数时直接传入想要查询的**公车路线 ID** 和**方向**。
-
-**范例 1：查询去程 (go)**
-
-```python
-if __name__ == "__main__":
-    bus_info("0161001500", "go")
