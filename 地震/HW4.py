@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import csv
 
-# 設定中文字型與負號顯示
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
 plt.rcParams['axes.unicode_minus'] = False
 
@@ -126,7 +124,6 @@ class HystereticModel:
             self.x_reversal_point = x_current_actual
             self.Fs_reversal_point = Fs_current_actual
 
-# 系統參數與初始條件
 m = 1.0
 xi = 0.05
 k1 = 631.65
@@ -135,15 +132,16 @@ xy = 1.0
 dt = 0.005
 total_time = 2.0
 num_steps = int(total_time / dt)
+
 wn = np.sqrt(k1 / m)
 c = 2 * m * wn * xi
 
 x0 = 0.0
 x_dot0 = 40.0
 x_ddot0 = -c * x_dot0 / m
+
 F_external_input = 0.0
 
-# 初始化陣列
 t = np.linspace(0, total_time, num_steps + 1)
 x = np.zeros(num_steps + 1)
 x_dot = np.zeros(num_steps + 1)
@@ -161,7 +159,6 @@ tolerance = 1e-6
 max_iterations = 100
 points_of_interest = {}
 
-# 主迴圈
 for i in range(num_steps):
     x_k = x[i]
     for iter_count in range(max_iterations):
@@ -181,40 +178,74 @@ for i in range(num_steps):
 
     hysteretic_model.update_state(x[i+1], Fs[i], x[i], Fs[i])
     Fs[i+1], Kt[i+1] = hysteretic_model.get_Fs_and_Kt(x[i+1], x[i], Fs[i])
+
     x_ddot[i+1] = (4 / dt**2) * (x[i+1] - x[i]) - (4 / dt) * x_dot[i] - x_ddot[i]
     x_dot[i+1] = x_dot[i] + (dt / 2) * (x_ddot[i] + x_ddot[i+1])
 
-    # 標記特定點
-    if 'a' not in points_of_interest and x[i+1] >= xy and Fs[i+1] >= hysteretic_model.Fy * 0.99:
+    # 更簡潔的特定點判斷
+    if not points_of_interest.get('a') and x[i+1] >= xy and Fs[i+1] >= hysteretic_model.Fy * 0.99:
         points_of_interest['a'] = t[i+1]
-    if 'a' in points_of_interest and 'b' not in points_of_interest:
-        if x_dot[i] > 0 and x_dot[i+1] <= 0:
-            points_of_interest['b'] = t[i+1]
-    if 'b' in points_of_interest and 'c' not in points_of_interest:
-        if x[i] >= 0 and x[i+1] < 0 and hysteretic_model.current_branch == 'unload_pos':
-            points_of_interest['c'] = t[i+1]
-    if 'c' in points_of_interest and 'd' not in points_of_interest:
-        if x[i+1] <= -xy and Fs[i+1] <= hysteretic_model.Fy_neg * 0.99:
-            points_of_interest['d'] = t[i+1]
-    if 'd' in points_of_interest and 'e' not in points_of_interest:
-        if x_dot[i] < 0 and x_dot[i+1] >= 0:
-            points_of_interest['e'] = t[i+1]
+    if points_of_interest.get('a') and not points_of_interest.get('b') and x_dot[i] > 0 and x_dot[i+1] <= 0:
+        points_of_interest['b'] = t[i+1]
+    if points_of_interest.get('b') and not points_of_interest.get('c') and x[i] >= 0 and x[i+1] < 0 and hysteretic_model.current_branch == 'unload_pos':
+        points_of_interest['c'] = t[i+1]
+    if points_of_interest.get('c') and not points_of_interest.get('d') and x[i+1] <= -xy and Fs[i+1] <= hysteretic_model.Fy_neg * 0.99:
+        points_of_interest['d'] = t[i+1]
+    if points_of_interest.get('d') and not points_of_interest.get('e') and x_dot[i] < 0 and x_dot[i+1] >= 0:
+        points_of_interest['e'] = t[i+1]
 
-# 儲存模擬結果為 CSV（主時間步）
-with open("simulation_results.csv", mode="w", newline="", encoding="utf-8-sig") as file:
-    writer = csv.writer(file)
-    writer.writerow(["時間 (s)", "位移 (in)", "速度 (in/s)", "加速度 (in/s²)", "彈簧力 (k)"])
-    for i in range(num_steps + 1):
-        writer.writerow([f"{t[i]:.4f}", f"{x[i]:.4f}", f"{x_dot[i]:.4f}", f"{x_ddot[i]:.4f}", f"{Fs[i]:.4f}"])
+print("\n--- 前六個時間步的結果 ---")
+print(f"{'時間 (s)':<10} {'位移 (in)':<15} {'速度 (in/s)':<15} {'加速度 (in/s²)':<15} {'彈簧力 (k)':<15}")
+for i in range(min(num_steps + 1, 6)):
+    print(f"{t[i]:<10.4f} {x[i]:<15.4f} {x_dot[i]:<15.4f} {x_ddot[i]:<15.4f} {Fs[i]:<15.4f}")
 
-# 儲存特定點資訊為 CSV
-with open("points_of_interest.csv", mode="w", newline="", encoding="utf-8-sig") as file:
-    writer = csv.writer(file)
-    writer.writerow(["點位", "時間 (s)", "位移 (in)", "速度 (in/s)", "加速度 (in/s²)", "彈簧力 (k)"])
-    for label, time_val in sorted(points_of_interest.items(), key=lambda item: item[1]):
+print("\n--- 特定時間點 ---")
+sorted_points = sorted(points_of_interest.items(), key=lambda item: item[1])
+for point_label, time_val in sorted_points:
+    idx = int(time_val / dt)
+    if idx < len(x) and idx < len(Fs):
+        print(f"點 {point_label}: 時間 = {time_val:.3f}s, 位移 = {x[idx]:.4f} in, 速度 = {x_dot[idx]:.4f} in/s, 加速度 = {x_ddot[idx]:.4f} in/s², 彈簧力 = {Fs[idx]:.4f} k")
+    else:
+        print(f"警告: 點 {point_label} ({time_val:.3f}s) 的索引超出範圍，可能模擬時間不足。")
+
+def plot_time_history(time, data, labels, title, y_labels, colors, filename):
+    """繪製時間歷程圖的通用函數"""
+    num_plots = len(data)
+    plt.figure(figsize=(12, 4 * num_plots))
+    for i in range(num_plots):
+        plt.subplot(num_plots, 1, i + 1)
+        plt.plot(time, data[i], label=labels[i], color=colors[i])
+        plt.ylabel(y_labels[i])
+        plt.title(title)
+        plt.grid(True)
+        plt.legend()
+    plt.xlabel('Time t [s]')
+    plt.tight_layout()
+    plt.savefig(filename, format='jpg', dpi=300)
+    plt.show()
+
+def plot_hysteresis_loop(displacement, force, xy_pos, xy_neg, Fy_pos, Fy_neg, points, filename):
+    """繪製滯回圖的通用函數"""
+    plt.figure(figsize=(8, 6))
+    plt.plot(displacement, force, label='Spring Force <span class="math-inline">F\_s\(x\)</span> Hysteretic Loop', color='purple')
+    plt.axvline(x=xy_pos, color='gray', linestyle='--', label='Positive Yield Displacement')
+    plt.axvline(x=xy_neg, color='gray', linestyle='--', label='Negative Yield Displacement')
+    plt.axhline(y=Fy_pos, color='gray', linestyle='-.', label='Positive Yield Force')
+    plt.axhline(y=Fy_neg, color='gray', linestyle='-.', label='Negative Yield Force')
+
+    colors = ['red', 'green', 'blue', 'cyan', 'magenta']
+    labels_plot = list(points.keys())
+    sorted_points_list = sorted(points.items(), key=lambda item: item[1])
+
+    for j, (point_label, time_val) in enumerate(sorted_points_list):
         idx = int(time_val / dt)
-        writer.writerow([label, f"{time_val:.4f}", f"{x[idx]:.4f}", f"{x_dot[idx]:.4f}", f"{x_ddot[idx]:.4f}", f"{Fs[idx]:.4f}"])
+        if idx < len(displacement) and idx < len(force):
+            plt.scatter(displacement[idx], force[idx], color=colors[j % len(colors)], marker='o', s=100, zorder=5, label=f'Point {point_label}')
+            plt.text(displacement[idx] + 0.05, force[idx] + 0.05 * Fy_pos, point_label, fontsize=12, ha='left', va='bottom')
 
-# 畫圖（略）可根據需要保留或刪除
-
-print("✅ 模擬結果與特定點資訊已成功儲存為 CSV。")
+    plt.xlabel('Displacement x(t) [in]')
+    plt.ylabel('Spring Force <span class="math-inline">F\_s\(t\)</span> [k]')
+    plt.title('Spring Force <span class="math-inline">F\_s\(x\)</span> - Hysteretic Loop')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig
