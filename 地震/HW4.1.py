@@ -250,4 +250,13 @@ def plot_hysteresis_loop(displacement, force, xy_pos, xy_neg, Fy_pos, Fy_neg, po
     for j, (point_label, time_val) in enumerate(sorted_points_list):
         idx = int(time_val / dt)
         if idx < len(displacement) and idx < len(force):
-            plt.scatter(displacement[idx], force[idx], color=colors[j % len(colors)], marker='o', s=100, zorder=5, label
+            plt.scatter(displacement[idx], force[idx], color=colors[j % len(colors)], marker='o', s=100, zorder=5, label=f'Point {point_label}')
+            plt.text(displacement[idx] + 0.05, force[idx] + 0.05 * Fy_pos, point_label, fontsize=12, ha='left', va='bottom')
+    plt.xlabel('Displacement x(t) [in]')
+    plt.ylabel('Spring Force $F_s(t)$ [k]')
+    plt.title('Spring Force $F_s(x)$ - Hysteretic Loop')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(filename, format='jpg', dpi=300)
+    plt.show()
