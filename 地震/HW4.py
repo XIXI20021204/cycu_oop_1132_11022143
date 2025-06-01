@@ -194,9 +194,9 @@ for i in range(num_steps):
     if points_of_interest.get('d') and not points_of_interest.get('e') and x_dot[i] < 0 and x_dot[i+1] >= 0:
         points_of_interest['e'] = t[i+1]
 
-print("\n--- 前六個時間步的結果 ---")
+print("\n--- 前十個時間步的結果 ---")
 print(f"{'時間 (s)':<10} {'位移 (in)':<15} {'速度 (in/s)':<15} {'加速度 (in/s²)':<15} {'彈簧力 (k)':<15}")
-for i in range(min(num_steps + 1, 6)):
+for i in range(min(num_steps + 1, 10)):
     print(f"{t[i]:<10.4f} {x[i]:<15.4f} {x_dot[i]:<15.4f} {x_ddot[i]:<15.4f} {Fs[i]:<15.4f}")
 
 print("\n--- 特定時間點 ---")
