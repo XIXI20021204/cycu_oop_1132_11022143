@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import os
 
 # --- 1. Load Earthquake Ground Acceleration Data ---
-# Modify file path to your specific path
-file_path = r'C:\Users\User\Documents\GitHub\cycu_oop_1132_11022143\地震期末\Kobe.txt'
+# Make sure 'Kobe.txt' is in the same directory as this script, or provide the full path.
+file_path = "Kobe.txt"
 try:
     # Read data, skipping the first row (header) and specifying column names
     df_ground_accel = pd.read_csv(file_path, sep='\s+', header=None, skiprows=1, names=['Time (s)', 'Acceleration (g)'])
@@ -31,12 +31,12 @@ tmd_configurations = [
     {"label": "TMD_Config_3 (mu=0.2, alpha=0.7815, zeta_d=0.2098)", "mu": 0.2, "alpha": 0.7815, "zeta_d": 0.2098},
 ]
 
-# Create output directory if it doesn't exist
-output_dir = os.path.dirname(file_path)
+# Create output directory for plots and CSVs
+output_dir = 'output_data'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-# Dictionary to store results for comparison plots
+# Dictionary to store results for comparison plots and further analysis
 all_results_for_comparison = {}
 all_results_dfs = {} # To store full dataframes for individual CSVs and summaries
 
@@ -67,15 +67,22 @@ for config_num, tmd_config in enumerate(tmd_configurations):
     print(f"  Damper Damping Coefficient (cd): {cd:.2f} Ns/m")
 
     # --- 4. Establish 2DOF System Matrices ---
+    # M = [[ms, 0], [0, md]]
     M = np.array([[ms, 0],
                   [0, md]])
 
-    C = np.array([[cs + cd, -cd],
-                  [-cd, cd]])
-
+    # K = [[ks + kd, -kd], [-kd, kd]]
     K = np.array([[ks + kd, -kd],
                   [-kd, kd]])
 
+    # C = [[cs + cd, -cd], [-cd, cd]]
+    C = np.array([[cs + cd, -cd],
+                  [-cd, cd]])
+
+    # Load matrix (influence vector for ground acceleration)
+    # This matrix determines how the ground acceleration force is distributed.
+    # For a relative displacement formulation (u_s, u_d_rel_s), the force vector is -M @ [1, 0]^T * accel_g
+    # meaning ground acceleration primarily excites the main structure.
     load_matrix = np.array([[1], [0]])
 
     # --- 5. Numerical Integration (Newmark-Beta Method) ---
@@ -83,51 +90,70 @@ for config_num, tmd_config in enumerate(tmd_configurations):
     beta = 0.25
 
     num_steps = len(time_series)
+    # response array stores [u_s, u_d_rel_s, v_s, v_d_rel_s, a_s_rel_g, a_d_rel_s]
+    # where u_s is main structure displacement relative to ground,
+    # and u_d_rel_s is TMD displacement relative to main structure.
     response = np.zeros((num_steps, 6))
 
+    # Initial acceleration calculation: M a_0 + C v_0 + K u_0 = P_0
+    # Assuming initial displacements and velocities are zero (u_0 = 0, v_0 = 0).
+    # P_0 = -M @ load_matrix * ground_accel[0]
     initial_accel_vec = np.linalg.solve(M, -M @ load_matrix * ground_accel[0])
 
-    response[0, 4] = initial_accel_vec[0, 0]
-    response[0, 5] = initial_accel_vec[1, 0]
+    response[0, 4] = initial_accel_vec[0, 0] # Initial relative acceleration of main structure (a_s_rel_g)
+    response[0, 5] = initial_accel_vec[1, 0] # Initial relative acceleration of TMD w.r.t main structure (a_d_rel_s)
 
+    # Pre-calculate K_eff as it's constant throughout the integration
     K_eff = K + (gamma / (beta * dt)) * C + (1 / (beta * dt**2)) * M
 
     for i in range(num_steps - 1):
-        u_i = response[i, 0:2].reshape(-1, 1)
-        v_i = response[i, 2:4].reshape(-1, 1)
-        a_i = response[i, 4:6].reshape(-1, 1)
+        # Current state vectors (reshaped to column vectors for matrix operations)
+        u_i = response[i, 0:2].reshape(-1, 1) # Current relative displacements
+        v_i = response[i, 2:4].reshape(-1, 1) # Current relative velocities
+        a_i = response[i, 4:6].reshape(-1, 1) # Current relative accelerations
 
+        # External force vector at time t+dt
         P_t_plus_dt = -M @ load_matrix * ground_accel[i+1]
 
+        # Effective load vector (RHS) for Newmark-Beta method
         RHS_force_terms = P_t_plus_dt + \
                           M @ ((1/(beta*dt**2))*u_i + (1/(beta*dt))*v_i + (1/(2*beta) - 1)*a_i) + \
                           C @ ((gamma/(beta*dt))*u_i + (gamma/beta - 1)*v_i + (gamma/2 - beta)*dt*a_i)
 
+        # Solve for displacement at t+dt (u_t_plus_dt)
         u_t_plus_dt = np.linalg.solve(K_eff, RHS_force_terms)
 
+        # Update acceleration and velocity at t+dt using Newmark-Beta formulas
         a_t_plus_dt = (1/(beta*dt**2)) * (u_t_plus_dt - u_i) - (1/(beta*dt)) * v_i - (1/(2*beta) - 1) * a_i
         v_t_plus_dt = v_i + (1 - gamma) * dt * a_i + gamma * dt * a_t_plus_dt
 
-        response[i+1, 0:2] = u_t_plus_dt.flatten()
-        response[i+1, 2:4] = v_t_plus_dt.flatten()
-        response[i+1, 4:6] = a_t_plus_dt.flatten()
+        # Store results for the next time step (flatten to store into 1D slices of response array)
+        response[i+1, 0:2] = u_t_plus_dt.flatten() # [u_s_rel_g, u_d_rel_s]
+        response[i+1, 2:4] = v_t_plus_dt.flatten() # [v_s_rel_g, v_d_rel_s]
+        response[i+1, 4:6] = a_t_plus_dt.flatten() # [a_s_rel_g, a_d_rel_s]
 
-    # --- 6. Calculate Absolute Responses ---
+    # --- 6. Calculate Absolute Responses for output and analysis ---
+    # Absolute displacement of TMD = (main structure relative to ground) + (TMD relative to main structure)
     u_d_abs = response[:, 0] + response[:, 1]
-    u_double_dot_s_abs = response[:, 4]
-    u_double_dot_d_abs = response[:, 4] + response[:, 5]
+    # Absolute acceleration of main structure = (main structure relative acceleration) + (ground acceleration)
+    u_double_dot_s_abs = response[:, 4] + ground_accel
+    # Absolute acceleration of TMD = (TMD relative acceleration to ground) + (ground acceleration)
+    # TMD relative acceleration to ground = (main structure relative acceleration) + (TMD relative acceleration to main structure)
+    u_double_dot_d_abs = (response[:, 4] + response[:, 5]) + ground_accel
 
+
+    # Create a DataFrame to store all calculated responses for this configuration
     results_df = pd.DataFrame({
         'Time (s)': time_series,
         'Ground Accel (m/s²)': ground_accel,
-        'Floor Disp (m)': response[:, 0],
-        'Floor Vel (m/s)': response[:, 2],
-        'Floor Accel (m/s²)': u_double_dot_s_abs,
-        'Damper Rel Disp (m)': response[:, 1],
-        'Damper Rel Vel (m/s)': response[:, 3],
-        'Damper Rel Accel (m/s²)': response[:, 5],
-        'Damper Abs Disp (m)': u_d_abs,
-        'Damper Abs Accel (m/s²)': u_double_dot_d_abs
+        'Floor Disp (m)': response[:, 0],          # Main structure relative displacement to ground
+        'Floor Vel (m/s)': response[:, 2],          # Main structure relative velocity to ground
+        'Floor Accel (m/s²)': u_double_dot_s_abs,   # Main structure absolute acceleration
+        'Damper Rel Disp (m)': response[:, 1],      # TMD relative displacement to main structure
+        'Damper Rel Vel (m/s)': response[:, 3],      # TMD relative velocity to main structure
+        'Damper Rel Accel (m/s²)': response[:, 5],  # TMD relative acceleration to main structure
+        'Damper Abs Disp (m)': u_d_abs,             # TMD absolute displacement
+        'Damper Abs Accel (m/s²)': u_double_dot_d_abs # TMD absolute acceleration
     })
 
     print(f"\n--- First 5 rows of Calculated Responses for {tmd_config['label']} ---")
@@ -136,14 +162,13 @@ for config_num, tmd_config in enumerate(tmd_configurations):
     # Store full DataFrame for individual CSV saving and summary later
     all_results_dfs[tmd_config['label']] = results_df
 
-    # Store relevant data for comparison plots
+    # Store relevant data for comparison plots (only Floor Disp is needed for the requested plot)
     all_results_for_comparison[tmd_config['label']] = {
-        'Floor Accel': results_df['Floor Accel (m/s²)'],
-        'Floor Disp': results_df['Floor Disp (m)'],
-        'Damper Abs Accel': results_df['Damper Abs Accel (m/s²)']
+        'Floor Disp': results_df['Floor Disp (m)']
     }
 
     # --- Save individual results to a CSV file ---
+    # Clean up label for filename by replacing spaces and parentheses
     output_csv_filename = f"{tmd_config['label'].replace(' ', '_').replace('(', '').replace(')', '')}_simulation_results.csv"
     output_csv_path = os.path.join(output_dir, output_csv_filename)
     try:
@@ -168,49 +193,31 @@ for config_num, tmd_config in enumerate(tmd_configurations):
 
 print("\n--- All individual simulations completed. Generating comparison plots ---")
 
-# --- 7. Plotting Comparison Results ---
-
-# Plot 1: Floor Absolute Acceleration Comparison
-plt.figure(figsize=(12, 6))
-for label, data in all_results_for_comparison.items():
-    plt.plot(time_series, data['Floor Accel'], label=label)
-plt.plot(time_series, ground_accel, linestyle='--', alpha=0.7, color='black', label='Ground Acceleration Input')
-plt.title('Floor Absolute Acceleration Response Comparison')
-plt.xlabel('Time (s)')
-plt.ylabel('Acceleration (m/s²)')
-plt.grid(True)
-plt.legend()
-comparison_plot_path_accel = os.path.join(output_dir, 'Floor_Absolute_Acceleration_Comparison.png')
-plt.savefig(comparison_plot_path_accel)
-print(f"Floor Acceleration Comparison plot saved to: {comparison_plot_path_accel}")
-plt.show()
-
-# Plot 2: Floor Displacement Comparison
+# --- 7. Plotting Comparison Results (Only Floor Displacement as requested) ---
 plt.figure(figsize=(12, 6))
 for label, data in all_results_for_comparison.items():
     plt.plot(time_series, data['Floor Disp'], label=label)
-plt.title('Floor Displacement Response Comparison')
-plt.xlabel('Time (s)')
-plt.ylabel('Displacement (m)')
+plt.title('主結構位移響應比較 (相對於地面)') # Title in Chinese
+plt.xlabel('時間 (s)') # X-label in Chinese
+plt.ylabel('位移 (m)') # Y-label in Chinese
 plt.grid(True)
 plt.legend()
-comparison_plot_path_disp = os.path.join(output_dir, 'Floor_Displacement_Comparison.png')
+comparison_plot_path_disp = os.path.join(output_dir, 'Main_Structure_Displacement_Comparison.png')
 plt.savefig(comparison_plot_path_disp)
-print(f"Floor Displacement Comparison plot saved to: {comparison_plot_path_disp}")
+print(f"主結構位移比較圖已儲存至: {comparison_plot_path_disp}")
 plt.show()
 
-# Plot 3: Damper Absolute Acceleration Comparison
-plt.figure(figsize=(12, 6))
-for label, data in all_results_for_comparison.items():
-    plt.plot(time_series, data['Damper Abs Accel'], label=label)
-plt.title('Damper Absolute Acceleration Response Comparison')
-plt.xlabel('Time (s)')
-plt.ylabel('Acceleration (m/s²)')
-plt.grid(True)
-plt.legend()
-comparison_plot_path_damper_accel = os.path.join(output_dir, 'Damper_Absolute_Acceleration_Comparison.png')
-plt.savefig(comparison_plot_path_damper_accel)
-print(f"Damper Acceleration Comparison plot saved to: {comparison_plot_path_damper_accel}")
-plt.show()
+# --- Calculate and print Mean, RMS, Peak values for Floor Displacement ---
+print("\n--- 主結構位移（相對於地面）效能指標 ---")
+print("{:<45} {:<15} {:<15} {:<15}".format("TMD 配置", "平均值 (m)", "均方根值 (m)", "尖峰值 (m)"))
+print("-" * 90)
 
-print("\n--- All simulations and comparison plots completed ---")
+for label, df in all_results_dfs.items():
+    floor_disp = df['Floor Disp (m)']
+    mean_disp = np.mean(floor_disp)
+    rms_disp = np.sqrt(np.mean(floor_disp**2))
+    peak_disp = np.max(np.abs(floor_disp)) # Use absolute value for peak
+
+    print(f"{label:<45} {mean_disp:<15.6f} {rms_disp:<15.6f} {peak_disp:<15.6f}")
+
+print("\n--- 所有模擬與計算完成 ---")
