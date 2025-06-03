@@ -2,58 +2,58 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# --- 1. 載入地震地表加速度數據 ---
-# 假設 'Kobe.txt' 檔案與此腳本位於同一目錄下，或提供一個預設路徑
-file_path = 'Kobe.txt'
+# --- 1. Load Earthquake Ground Acceleration Data ---
+# Modify file path to your specific path
+file_path = r'C:\Users\User\Documents\GitHub\cycu_oop_1132_11022143\地震期末\Kobe.txt'
 try:
-    # 讀取數據，跳過第一行（標題行），並指定列名
+    # Read data, skipping the first row (header) and specifying column names
     df_ground_accel = pd.read_csv(file_path, sep='\s+', header=None, skiprows=1, names=['Time (s)', 'Acceleration (g)'])
-    # 將加速度從 'g' 轉換為 m/s^2 (假設 1g = 9.81 m/s^2)
-    g = 9.81  # 重力加速度，單位為 m/s^2
+    # Convert acceleration from 'g' to m/s^2 (assuming 1g = 9.81 m/s^2)
+    g = 9.81  # Acceleration due to gravity in m/s^2
     df_ground_accel['Acceleration (m/s²)'] = df_ground_accel['Acceleration (g)'] * g
-    time_series = df_ground_accel['Time (s)'].values # 時間序列
-    ground_accel = df_ground_accel['Acceleration (m/s²)'].values # 地震地表加速度
-    dt = time_series[1] - time_series[0] # 時間步長
+    time_series = df_ground_accel['Time (s)'].values # Time series
+    ground_accel = df_ground_accel['Acceleration (m/s²)'].values # Ground surface acceleration
+    dt = time_series[1] - time_series[0] # Time step
 except FileNotFoundError:
-    print(f"錯誤：找不到檔案 '{file_path}'。請確保檔案在正確的目錄中。")
+    print(f"Error: The file '{file_path}' was not found. Please make sure it's in the correct directory.")
     exit()
 
-# --- 2. 定義系統參數 ---
-# 主結構（單層樓）參數
-ms = 84600000  # KG (主結構質量) [cite: 1]
-# 自然頻率通常是 omega_n 或 f_n，這裡假設 "自然頻率比0.9174rad/s" 是主結構的自然頻率 omega_ns
-omega_ns = 0.9174  # rad/s (主結構自然頻率) [cite: 1]
-zeta_s = 0.01  # (主結構阻尼比) [cite: 1]
+# --- 2. Define System Parameters ---
+# Main Structure (Single Floor) Parameters
+ms = 84600000  # KG (mass of the main structure)
+# Assuming "自然頻率比0.9174rad/s" means omega_ns = 0.9174 rad/s
+omega_ns = 0.9174  # rad/s (natural frequency of the main structure)
+zeta_s = 0.01  # (damping ratio of the main structure)
 
-# 調諧質量阻尼器 (TMD) 參數
-mu = 0.03  # md/ms (阻尼器質量比) [cite: 1]
-alpha = 0.9592  # omega_nd/omega_ns (調諧頻率比) [cite: 1]
-zeta_d = 0.0857  # (阻尼器阻尼比) [cite: 1]
+# Tuned Mass Damper (TMD) Parameters
+mu = 0.03  # md/ms (damper mass ratio)
+alpha = 0.9592  # omega_nd/omega_ns (tuning frequency ratio)
+zeta_d = 0.0857  # (damper damping ratio)
 
-# --- 3. 推導物理參數 ---
-# 主結構參數
-ks = ms * (omega_ns**2)  # 主結構剛度
-cs = 2 * zeta_s * ms * omega_ns  # 主結構阻尼係數
+# --- 3. Derive Physical Parameters ---
+# Main Structure parameters
+ks = ms * (omega_ns**2)  # Stiffness of the main structure
+cs = 2 * zeta_s * ms * omega_ns  # Damping coefficient of the main structure
 
-# TMD 參數
-md = mu * ms  # 阻尼器質量
-omega_nd = alpha * omega_ns  # 阻尼器自然頻率
-kd = md * (omega_nd**2)  # 阻尼器剛度
-cd = 2 * zeta_d * md * omega_nd  # 阻尼器阻尼係數
+# TMD parameters
+md = mu * ms  # Mass of the damper
+omega_nd = alpha * omega_ns  # Natural frequency of the damper
+kd = md * (omega_nd**2)  # Stiffness of the damper
+cd = 2 * zeta_d * md * omega_nd  # Damping coefficient of the damper
 
-print(f"推導出的主結構參數：")
-print(f"  剛度 (ks): {ks:.2f} N/m")
-print(f"  阻尼係數 (cs): {cs:.2f} Ns/m")
-print(f"\n推導出的 TMD 參數：")
-print(f"  阻尼器質量 (md): {md:.2f} KG")
-print(f"  阻尼器自然頻率 (omega_nd): {omega_nd:.4f} rad/s")
-print(f"  阻尼器剛度 (kd): {kd:.2f} N/m")
-print(f"  阻尼器阻尼係數 (cd): {cd:.2f} Ns/m")
+print(f"Derived Main Structure Parameters:")
+print(f"  Stiffness (ks): {ks:.2f} N/m")
+print(f"  Damping Coefficient (cs): {cs:.2f} Ns/m")
+print(f"\nDerived TMD Parameters:")
+print(f"  Damper Mass (md): {md:.2f} KG")
+print(f"  Damper Natural Frequency (omega_nd): {omega_nd:.4f} rad/s")
+print(f"  Damper Stiffness (kd): {kd:.2f} N/m")
+print(f"  Damper Damping Coefficient (cd): {cd:.2f} Ns/m")
 
-# --- 4. 建立雙自由度系統矩陣 ---
-# 自由度定義：
-# x[0] = us (主結構相對於地面的位移)
-# x[1] = ud (阻尼器相對於主結構的位移)
+# --- 4. Establish 2DOF System Matrices ---
+# Degrees of Freedom:
+# x[0] = us (displacement of main structure relative to ground)
+# x[1] = ud (displacement of damper relative to main structure)
 
 M = np.array([[ms, 0],
               [0, md]])
@@ -64,152 +64,152 @@ C = np.array([[cs + cd, -cd],
 K = np.array([[ks + kd, -kd],
               [-kd, kd]])
 
-# 地面加速度的載荷向量
+# Load vector for ground acceleration
 # P(t) = -M * 1 * u_double_dot_g(t)
-# 其中 1 = {1, 0} 用於 us_relative_to_ground 和 ud_relative_to_structure
+# Where 1 = {1, 0} for us_relative_to_ground and ud_relative_to_structure
 load_matrix = np.array([[1], [0]])
 
-# --- 5. 數值積分 (Newmark-Beta 方法) ---
-# Newmark-beta 參數（平均常加速度法）
+# --- 5. Numerical Integration (Newmark-Beta Method) ---
+# Newmark-beta parameters (Average Constant Acceleration Method)
 gamma = 0.5
 beta = 0.25
 
 num_steps = len(time_series)
-# 初始化位移、速度和加速度向量
-# us = 主結構相對於地面的位移
-# ud_rel = 阻尼器相對於主結構的位移
-# u_double_dot_s = 主結構的絕對加速度
-# u_double_dot_d_abs = 阻尼器的絕對加速度
-
-# 響應數據儲存為列：us, ud_rel, us_dot, ud_rel_dot, us_double_dot, ud_rel_double_dot
+# Initialize displacement, velocity, and acceleration vectors
+# Responses are stored as columns: us, ud_rel, us_dot, ud_rel_dot, us_double_dot, ud_rel_double_dot
 response = np.zeros((num_steps, 6))
 
-# 初始條件（全部為零）
+# Initial conditions (all zero)
 us_0 = 0.0
 ud_rel_0 = 0.0
 us_dot_0 = 0.0
 ud_rel_dot_0 = 0.0
 
-# 計算初始加速度
-# M * u_double_dot_0 = -K * u_0 - C * u_dot_0 - M * load_matrix * ground_accel[0]
-# 因為 u_0 和 u_dot_0 為零，且在載荷項中使用絕對加速度
-# M * u_double_dot_0 = -M_effective * ground_accel[0]
-# 對於相對位移 us 和 ud_rel:
-# M * u_double_dot + C * u_dot + K * u = -M * [1, 0].T * ground_accel
-# 因此，初始加速度 u_double_dot_0 = -M_inv * M_load * ground_accel[0]
-initial_accel_vec = np.linalg.solve(M, -M @ load_matrix * ground_accel[0]).flatten()
+# Calculate initial accelerations
+# Initial acceleration vector should be (2,1) shape
+initial_accel_vec = np.linalg.solve(M, -M @ load_matrix * ground_accel[0])
 
-response[0, 4] = initial_accel_vec[0] # 初始 us_double_dot (相對)
-response[0, 5] = initial_accel_vec[1] # 初始 ud_rel_double_dot
+response[0, 4] = initial_accel_vec[0, 0] # initial us_double_dot (relative)
+response[0, 5] = initial_accel_vec[1, 0] # initial ud_rel_double_dot
 
-# Newmark-beta 的有效剛度矩陣
+# Effective stiffness matrix for Newmark-beta
 K_eff = K + (gamma / (beta * dt)) * C + (1 / (beta * dt**2)) * M
 
-# 迴圈遍歷時間步長
+# Loop through time steps
 for i in range(num_steps - 1):
-    # 當前值
-    u_i = response[i, 0:2] # us, ud_rel
-    v_i = response[i, 2:4] # us_dot, ud_rel_dot
-    a_i = response[i, 4:6] # us_double_dot, ud_rel_double_dot
+    # Current values, ensure they are (2,1) column vectors
+    u_i = response[i, 0:2].reshape(-1, 1) # us, ud_rel
+    v_i = response[i, 2:4].reshape(-1, 1) # us_dot, ud_rel_dot
+    a_i = response[i, 4:6].reshape(-1, 1) # us_double_dot, ud_rel_double_dot
 
-    # t+dt 時刻的有效載荷向量
-    P_t_plus_dt = -M @ load_matrix * ground_accel[i+1] # t+dt 時刻由地面加速度引起的力
+    # Effective load vector at t+dt
+    P_t_plus_dt = -M @ load_matrix * ground_accel[i+1] # Force due to ground acceleration at t+dt, shape (2,1)
 
-    # RHS_force_terms 包含來自 M 和 C 項的簡化 Newmark-beta 方程
-    RHS_force_terms = P_t_plus_dt + np.dot(M, (1/(beta*dt**2))*u_i + (1/(beta*dt))*v_i + (1/(2*beta) - 1)*a_i) + \
-                      np.dot(C, (gamma/(beta*dt))*u_i + (gamma/beta - 1)*v_i + (gamma/2 - beta)*dt*a_i)
+    # Calculate RHS_force_terms
+    # Ensure all summed terms are (2,1) shape, use @ for matrix multiplication
+    RHS_force_terms = P_t_plus_dt + \
+                      M @ ((1/(beta*dt**2))*u_i + (1/(beta*dt))*v_i + (1/(2*beta) - 1)*a_i) + \
+                      C @ ((gamma/(beta*dt))*u_i + (gamma/beta - 1)*v_i + (gamma/2 - beta)*dt*a_i)
 
-    # 求解 t+dt 時刻的位移
+    # Solve for displacement at t+dt, result will be (2,1)
     u_t_plus_dt = np.linalg.solve(K_eff, RHS_force_terms)
 
-    # 更新 t+dt 時刻的加速度和速度
+    # Update accelerations and velocities at t+dt, result will be (2,1)
     a_t_plus_dt = (1/(beta*dt**2)) * (u_t_plus_dt - u_i) - (1/(beta*dt)) * v_i - (1/(2*beta) - 1) * a_i
     v_t_plus_dt = v_i + (1 - gamma) * dt * a_i + gamma * dt * a_t_plus_dt
 
-    # 儲存結果
-    response[i+1, 0:2] = u_t_plus_dt # us, ud_rel
-    response[i+1, 2:4] = v_t_plus_dt # us_dot, ud_rel_dot
-    response[i+1, 4:6] = a_t_plus_dt # us_double_dot, ud_rel_double_dot
+    # Store results into the (2,) slice of the response array, need to flatten (2,1) results to (2,)
+    response[i+1, 0:2] = u_t_plus_dt.flatten() # us, ud_rel
+    response[i+1, 2:4] = v_t_plus_dt.flatten() # us_dot, ud_rel_dot
+    response[i+1, 4:6] = a_t_plus_dt.flatten() # us_double_dot, ud_rel_double_dot
 
-# --- 6. 計算絕對響應和性能指標 ---
-# us: 主結構相對於地面的位移
-# ud_rel: 阻尼器相對於主結構的位移
+# --- 6. Calculate Absolute Responses and Performance Metrics ---
+# us: displacement of main structure relative to ground
+# ud_rel: displacement of damper relative to main structure
 
-# 阻尼器的絕對位移
+# Absolute displacement of damper
 u_d_abs = response[:, 0] + response[:, 1]
 
-# 主結構的絕對加速度（相對於地面）
-# response[:, 4] 已經是 u_double_dot_s (相對於地面，這對於主結構來說就是絕對加速度)
+# Absolute acceleration of main structure (relative to ground)
+# response[:, 4] is already u_double_dot_s (relative to ground, which is absolute for the main structure)
 u_double_dot_s_abs = response[:, 4]
 
-# 阻尼器的絕對加速度（相對於地面）
+# Absolute acceleration of damper (relative to ground)
 u_double_dot_d_abs = response[:, 4] + response[:, 5]
 
-# 將響應結果轉換為 DataFrame 以便於處理
+# Convert responses to a DataFrame for easier handling
 results_df = pd.DataFrame({
-    '時間 (s)': time_series,
-    '地表加速度 (m/s²)': ground_accel,
-    '樓層位移 (m)': response[:, 0],
-    '樓層速度 (m/s)': response[:, 2],
-    '樓層加速度 (m/s²)': u_double_dot_s_abs, # 這是樓層的絕對加速度
-    '阻尼器相對位移 (m)': response[:, 1], # 阻尼器相對於樓層的位移
-    '阻尼器相對速度 (m/s)': response[:, 3], # 阻尼器相對於樓層的速度
-    '阻尼器相對加速度 (m/s²)': response[:, 5], # 阻尼器相對於樓層的加速度
-    '阻尼器絕對位移 (m)': u_d_abs, # 阻尼器絕對位移
-    '阻尼器絕對加速度 (m/s²)': u_double_dot_d_abs # 阻尼器絕對加速度
+    'Time (s)': time_series,
+    'Ground Accel (m/s²)': ground_accel,
+    'Floor Disp (m)': response[:, 0],
+    'Floor Vel (m/s)': response[:, 2],
+    'Floor Accel (m/s²)': u_double_dot_s_abs, # This is the absolute acceleration of the floor
+    'Damper Rel Disp (m)': response[:, 1], # Damper displacement relative to floor
+    'Damper Rel Vel (m/s)': response[:, 3], # Damper velocity relative to floor
+    'Damper Rel Accel (m/s²)': response[:, 5], # Damper acceleration relative to floor
+    'Damper Abs Disp (m)': u_d_abs, # Damper absolute displacement
+    'Damper Abs Accel (m/s²)': u_double_dot_d_abs # Damper absolute acceleration
 })
 
-print("\n--- 計算出的響應前 5 行 ---")
+print("\n--- First 5 rows of Calculated Responses ---")
 print(results_df.head())
 
-# --- 7. 繪製結果 ---
+# --- Save results to a CSV file ---
+output_csv_path = r'C:\Users\User\Documents\GitHub\cycu_oop_1132_11022143\地震期末\simulation_results.csv'
+try:
+    results_df.to_csv(output_csv_path, index=False, encoding='utf-8')
+    print(f"\nCalculation results successfully saved to: {output_csv_path}")
+except Exception as e:
+    print(f"\nError saving file: {e}")
+
+# --- 7. Plotting Results ---
 plt.figure(figsize=(15, 10))
 
-# 繪製樓層絕對加速度
+# Plot Floor Absolute Acceleration
 plt.subplot(3, 1, 1)
-plt.plot(results_df['時間 (s)'], results_df['樓層加速度 (m/s²)'], label='樓層絕對加速度')
-plt.plot(results_df['時間 (s)'], results_df['地表加速度 (m/s²)'], linestyle='--', alpha=0.7, label='地表加速度輸入')
-plt.title('樓層絕對加速度響應')
-plt.xlabel('時間 (s)')
-plt.ylabel('加速度 (m/s²)')
+plt.plot(results_df['Time (s)'], results_df['Floor Accel (m/s²)'], label='Floor Absolute Acceleration')
+plt.plot(results_df['Time (s)'], results_df['Ground Accel (m/s²)'], linestyle='--', alpha=0.7, label='Ground Acceleration Input')
+plt.title('Floor Absolute Acceleration Response')
+plt.xlabel('Time (s)')
+plt.ylabel('Acceleration (m/s²)')
 plt.grid(True)
 plt.legend()
 
-# 繪製樓層位移
+# Plot Floor Displacement
 plt.subplot(3, 1, 2)
-plt.plot(results_df['時間 (s)'], results_df['樓層位移 (m)'], label='樓層位移 (相對於地面)')
-plt.title('樓層位移響應')
-plt.xlabel('時間 (s)')
-plt.ylabel('位移 (m)')
+plt.plot(results_df['Time (s)'], results_df['Floor Disp (m)'], label='Floor Displacement (relative to ground)')
+plt.title('Floor Displacement Response')
+plt.xlabel('Time (s)')
+plt.ylabel('Displacement (m)')
 plt.grid(True)
 plt.legend()
 
-# 繪製阻尼器絕對加速度
+# Plot Damper Absolute Acceleration
 plt.subplot(3, 1, 3)
-plt.plot(results_df['時間 (s)'], results_df['阻尼器絕對加速度 (m/s²)'], label='阻尼器絕對加速度')
-plt.plot(results_df['時間 (s)'], results_df['阻尼器相對加速度 (m/s²)'], linestyle=':', alpha=0.7, label='阻尼器相對加速度 (相對於樓層)')
-plt.title('阻尼器加速度響應')
-plt.xlabel('時間 (s)')
-plt.ylabel('加速度 (m/s²)')
+plt.plot(results_df['Time (s)'], results_df['Damper Abs Accel (m/s²)'], label='Damper Absolute Acceleration')
+plt.plot(results_df['Time (s)'], results_df['Damper Rel Accel (m/s²)'], linestyle=':', alpha=0.7, label='Damper Relative Acceleration (relative to floor)')
+plt.title('Damper Acceleration Response')
+plt.xlabel('Time (s)')
+plt.ylabel('Acceleration (m/s²)')
 plt.grid(True)
 plt.legend()
 
 plt.tight_layout()
 plt.show()
 
-# --- 8. 基本性能指標 (可選) ---
+# --- 8. Basic Performance Metrics (Optional) ---
 max_ground_accel = np.max(np.abs(ground_accel))
-max_floor_accel = np.max(np.abs(results_df['樓層加速度 (m/s²)']))
-max_floor_disp = np.max(np.abs(results_df['樓層位移 (m)']))
-max_damper_abs_accel = np.max(np.abs(results_df['阻尼器絕對加速度 (m/s²)']))
-max_damper_rel_disp = np.max(np.abs(results_df['阻尼器相對位移 (m)']))
+max_floor_accel = np.max(np.abs(results_df['Floor Accel (m/s²)']))
+max_floor_disp = np.max(np.abs(results_df['Floor Disp (m)']))
+max_damper_abs_accel = np.max(np.abs(results_df['Damper Abs Accel (m/s²)']))
+max_damper_rel_disp = np.max(np.abs(results_df['Damper Rel Disp (m)']))
 
-print(f"\n--- 響應摘要 ---")
-print(f"最大地表加速度: {max_ground_accel:.4f} m/s²")
-print(f"最大樓層絕對加速度: {max_floor_accel:.4f} m/s²")
-print(f"最大樓層位移 (相對於地面): {max_floor_disp:.4f} m")
-print(f"最大阻尼器絕對加速度: {max_damper_abs_accel:.4f} m/s²")
-print(f"最大阻尼器相對位移 (相對於樓層): {max_damper_rel_disp:.4f} m")
+print(f"\n--- Response Summary ---")
+print(f"Max Ground Acceleration: {max_ground_accel:.4f} m/s²")
+print(f"Max Floor Absolute Acceleration: {max_floor_accel:.4f} m/s²")
+print(f"Max Floor Displacement (relative to ground): {max_floor_disp:.4f} m")
+print(f"Max Damper Absolute Acceleration: {max_damper_abs_accel:.4f} m/s²")
+print(f"Max Damper Relative Displacement (relative to floor): {max_damper_rel_disp:.4f} m")
 
-# 若要計算沒有 TMD 的情況，您需要另外運行一個單自由度 (SDOF) 分析。
-# 此程式碼目前僅計算有 TMD 的情況。
+# To calculate without TMD, you would need to run a separate SDOF analysis.
+# This code currently only calculates with TMD.
