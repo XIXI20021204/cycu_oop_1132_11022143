@@ -5,7 +5,7 @@ import os
 
 # --- 1. Load Earthquake Ground Acceleration Data ---
 # Make sure 'Kobe.txt' is in the same directory as this script, or provide the full path.
-file_path = "Kobe.txt"
+file_path = r'C:\Users\a0965\OneDrive\文件\GitHub\cycu_oop_1132_11022143\地震期末\Kobe.txt'
 try:
     df_ground_accel = pd.read_csv(file_path, sep='\s+', header=None, skiprows=1, names=['Time (s)', 'Acceleration (g)'])
     g = 9.81  # Acceleration due to gravity in m/s^2
@@ -28,11 +28,11 @@ cs = 2 * zeta_s * ms * omega_ns
 
 print(f"--- Analyzing Single Floor Structure (No TMD) ---")
 print(f"Derived Main Structure Parameters:")
-print(f"  Mass (m): {ms:.2f} KG")
-print(f"  Stiffness (k): {ks:.2f} N/m")
-print(f"  Damping Coefficient (c): {cs:.2f} Ns/m")
-print(f"  Natural Frequency (omega_n): {omega_ns:.4f} rad/s")
-print(f"  Damping Ratio (zeta): {zeta_s:.4f}")
+print(f"   Mass (m): {ms:.2f} KG")
+print(f"   Stiffness (k): {ks:.2f} N/m")
+print(f"   Damping Coefficient (c): {cs:.2f} Ns/m")
+print(f"   Natural Frequency (omega_n): {omega_ns:.4f} rad/s")
+print(f"   Damping Ratio (zeta): {zeta_s:.4f}")
 
 # --- 3. Numerical Integration (Newmark-Beta Method) for SDOF system ---
 gamma = 0.5
@@ -83,8 +83,8 @@ for i in range(num_steps - 1):
 results_df_sdof = pd.DataFrame({
     'Time (s)': time_series,
     'Ground Accel (m/s²)': ground_accel,
-    'Floor Disp (m)': response[:, 0],          # Relative displacement to ground
-    'Floor Vel (m/s)': response[:, 1],          # Relative velocity to ground
+    'Floor Disp (m)': response[:, 0],           # Relative displacement to ground
+    'Floor Vel (m/s)': response[:, 1],           # Relative velocity to ground
     'Floor Accel (m/s²)': response[:, 2] + ground_accel # Absolute acceleration
 })
 
@@ -105,17 +105,29 @@ try:
 except Exception as e:
     print(f"Error saving file for Single Floor (No TMD): {e}")
 
+# --- Calculate Displacement Statistics ---
+floor_disp = results_df_sdof['Floor Disp (m)']
+average_disp = np.mean(floor_disp)
+rms_disp = np.sqrt(np.mean(floor_disp**2))
+peak_disp = np.max(np.abs(floor_disp)) # Use absolute for peak value
+
+print("\n--- Displacement Statistics (Single Floor, No TMD) ---")
+print(f"Average Displacement: {average_disp:.6f} m")
+print(f"RMS Displacement: {rms_disp:.6f} m")
+print(f"Peak Displacement: {peak_disp:.6f} m")
+
+
 # --- 5. Plotting Displacement History ---
 plt.figure(figsize=(12, 6))
 plt.plot(time_series, results_df_sdof['Floor Disp (m)'], label='Single Floor Displacement')
-plt.title('單層樓位移歷時圖 (無阻尼器)')
-plt.xlabel('時間 (s)')
-plt.ylabel('位移 (m)')
+plt.title('Single Floor Displacement History (No Damper)')
+plt.xlabel('Time (s)')
+plt.ylabel('Displacement (m)')
 plt.grid(True)
 plt.legend()
 plot_path_sdof = os.path.join(output_dir, 'Single_Floor_No_TMD_Displacement_History.png')
 plt.savefig(plot_path_sdof)
-print(f"單層樓位移歷時圖已儲存至: {plot_path_sdof}")
+print(f"Single Floor Displacement History plot saved to: {plot_path_sdof}")
 plt.show()
 
-print("\n--- 單層樓模擬完成 ---")
+print("\n--- Single Floor Simulation Completed ---")
