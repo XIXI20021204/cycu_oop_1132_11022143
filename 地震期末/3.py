@@ -5,7 +5,7 @@ import os
 
 # --- 1. Load Earthquake Ground Acceleration Data ---
 # Make sure 'Kobe.txt' is in the same directory as this script, or provide the full path.
-file_path = "Kobe.txt"
+file_path = r'C:\Users\a0965\OneDrive\文件\GitHub\cycu_oop_1132_11022143\地震期末\Kobe.txt'
 try:
     # Read data, skipping the first row (header) and specifying column names
     df_ground_accel = pd.read_csv(file_path, sep='\s+', header=None, skiprows=1, names=['Time (s)', 'Acceleration (g)'])
@@ -197,19 +197,19 @@ print("\n--- All individual simulations completed. Generating comparison plots -
 plt.figure(figsize=(12, 6))
 for label, data in all_results_for_comparison.items():
     plt.plot(time_series, data['Floor Disp'], label=label)
-plt.title('主結構位移響應比較 (相對於地面)') # Title in Chinese
-plt.xlabel('時間 (s)') # X-label in Chinese
-plt.ylabel('位移 (m)') # Y-label in Chinese
+plt.title('Main Structure Displacement Response Comparison (Relative to Ground)')
+plt.xlabel('Time (s)')
+plt.ylabel('Displacement (m)')
 plt.grid(True)
 plt.legend()
 comparison_plot_path_disp = os.path.join(output_dir, 'Main_Structure_Displacement_Comparison.png')
 plt.savefig(comparison_plot_path_disp)
-print(f"主結構位移比較圖已儲存至: {comparison_plot_path_disp}")
+print(f"Main structure displacement comparison plot saved to: {comparison_plot_path_disp}")
 plt.show()
 
 # --- Calculate and print Mean, RMS, Peak values for Floor Displacement ---
-print("\n--- 主結構位移（相對於地面）效能指標 ---")
-print("{:<45} {:<15} {:<15} {:<15}".format("TMD 配置", "平均值 (m)", "均方根值 (m)", "尖峰值 (m)"))
+print("\n--- Performance Metrics for Main Structure Displacement (Relative to Ground) ---")
+print("{:<45} {:<15} {:<15} {:<15}".format("TMD Configuration", "Mean (m)", "RMS (m)", "Peak (m)"))
 print("-" * 90)
 
 for label, df in all_results_dfs.items():
@@ -220,4 +220,4 @@ for label, df in all_results_dfs.items():
 
     print(f"{label:<45} {mean_disp:<15.6f} {rms_disp:<15.6f} {peak_disp:<15.6f}")
 
-print("\n--- 所有模擬與計算完成 ---")
+print("\n--- All simulations and calculations completed ---")

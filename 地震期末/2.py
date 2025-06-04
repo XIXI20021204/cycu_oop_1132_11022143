@@ -5,7 +5,7 @@ import os
 
 # --- 1. Load Earthquake Ground Acceleration Data ---
 # Modify file path to your specific path
-file_path = r'C:\Users\User\Documents\GitHub\cycu_oop_1132_11022143\地震期末\Kobe.txt'
+file_path = r'C:\Users\a0965\OneDrive\文件\GitHub\cycu_oop_1132_11022143\地震期末\Kobe.txt'
 try:
     # Read data, skipping the first row (header) and specifying column names
     df_ground_accel = pd.read_csv(file_path, sep='\s+', header=None, skiprows=1, names=['Time (s)', 'Acceleration (g)'])
