@@ -35,9 +35,7 @@ all_results_for_comparison_plots = {}
 all_results_dfs = {} # To store full dataframes for individual CSVs and summaries
 
 # ==============================================================================
----
 ## PART 1: Simulate Single Floor Structure (No TMD)
----
 # ==============================================================================
 print("\n" + "="*50)
 print("--- Analyzing Single Floor Structure (No TMD) ---")
@@ -138,9 +136,7 @@ print(f"Peak Displacement: {peak_disp_sdof_base:.6f} m")
 print("\n--- Single Floor Simulation Completed ---")
 
 # ==============================================================================
----
 ## PART 2: Simulate Main Structure with TMD Configurations
----
 # ==============================================================================
 print("\n\n" + "="*50)
 print("--- Analyzing Main Structure with TMD ---")
@@ -295,9 +291,7 @@ for config_num, tmd_config in enumerate(tmd_configurations):
 print("\n--- All individual simulations completed. Generating comparison plots ---")
 
 # ==============================================================================
----
 ## FINAL: Plotting All Comparison Results & Relative Error Analysis
----
 # ==============================================================================
 print("\n" + "="*50)
 print("--- Generating All Structure Main Structure Displacement Comparison Plot ---")
@@ -343,9 +337,8 @@ for label, df in all_results_dfs.items():
         rel_error_rms = "N/A"
         rel_error_peak = "N/A"
     else:
-        # Relative error = ((Value_TMD - Value_NoTMD) / Value_NoTMD) * 100%
-        # Or, to show reduction: ((Value_NoTMD - Value_TMD) / Value_NoTMD) * 100%
-        # Here we calculate reduction percentage:
+        # Relative error = ((Value_NoTMD - Value_TMD) / Value_NoTMD) * 100%
+        # This formula calculates the reduction percentage: a positive value means reduction.
         rel_error_mean = ((mean_disp_sdof_base - mean_disp) / mean_disp_sdof_base) * 100
         rel_error_rms = ((rms_disp_sdof_base - rms_disp) / rms_disp_sdof_base) * 100
         rel_error_peak = ((peak_disp_sdof_base - peak_disp) / peak_disp_sdof_base) * 100
