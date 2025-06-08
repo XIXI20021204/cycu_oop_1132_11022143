@@ -6,6 +6,10 @@ import os
 import time
 import sys # 引入 sys 模組用於退出程式
 
+# Install necessary packages
+# !pip install playwright pandas
+# !playwright install
+
 # Define the base path for input and output files
 # 請確認這個路徑是您實際擁有的，並且有寫入權限
 BASE_PATH = r'C:\Users\a0965\OneDrive\文件\GitHub\cycu_oop_1132_11022143\物件期末'
