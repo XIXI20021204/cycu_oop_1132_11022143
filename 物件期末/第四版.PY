@@ -177,7 +177,8 @@ if __name__ == "__main__":
 
                 if collapse_link.get_attribute("aria-expanded") == "false" or "collapse" in collapse_link.get_attribute("class"):
                     driver.execute_script("arguments[0].click();", collapse_link)
-                                        time.sleep(0.5)
+                    print(f"已點擊展開 #collapse{i}...")
+                    time.sleep(0.5)
 
             except Exception as e:
                 print(f"點擊 #collapse{i} 失敗或該元素不存在: {e}")
