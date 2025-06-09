@@ -4,6 +4,7 @@ import time
 import webbrowser
 import re
 import csv
+from bs4 import BeautifulSoup # 新增 Beautiful Soup 函式庫
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -16,6 +17,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 def get_bus_route_stops_from_ebus(route_id, bus_name, driver_instance):
     print(f"\n正在從 ebus.gov.taipei 獲取路線 '{bus_name}' ({route_id}) 的站牌數據...")
 
+    # 這個 URL 用於獲取站牌的名稱和經緯度，這是您原有程式碼的一部分
     url = f'https://ebus.gov.taipei/Route/StopsOfRoute?routeid={route_id}'
     wait = WebDriverWait(driver_instance, 20)
 
@@ -84,7 +86,8 @@ def display_bus_route_on_map(route_name, stops_data, bus_location=None, estimate
         stop_name = stop["name"]
         coords = [stop["lat"], stop["lon"]]
 
-        est_time_text = estimated_times.get(stop_name, "未知") if estimated_times else "未知"
+        # 從傳入的 estimated_times 字典中獲取到站時間
+        est_time_text = estimated_times.get(stop_name, "無資料") if estimated_times else "無資料"
         popup_html = f"<b>{stop_name}</b><br>預估時間: {est_time_text}"
 
         folium.Marker(
@@ -140,43 +143,36 @@ def export_stops_to_csv(route_name, stops_data):
     except Exception as e:
         print(f"錯誤：輸出 '{csv_filename}' 時發生問題：{e}")
 
+# 新的 get_estimated_times_from_ebus 函數，使用 BeautifulSoup
 def get_estimated_times_from_ebus(route_id, driver_instance):
-    """
-    從 ebus.gov.taipei 取得指定路線各站的預估到站時間。
-    回傳 dict: {站名: 預估到站時間字串}
-    """
-    url = f'https://ebus.gov.taipei/Route/EstimateTimeOfRoute?routeid={route_id}'
-    wait = WebDriverWait(driver_instance, 20)
+    print(f"正在從 ebus.gov.taipei 獲取路線 '{route_id}' 的預估到站時間...")
+    # 使用 VsSimpleMap 頁面來獲取實時到站時間
+    url = f"https://ebus.gov.taipei/EBus/VsSimpleMap?routeid={route_id}&amppgb=0"
     estimated_times = {}
     try:
         driver_instance.get(url)
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'span.auto-list-stationlist-place')))
-        time.sleep(1.5)
-        page_content = driver_instance.page_source
+        # 這裡的等待時間很重要，確保 JavaScript 數據被載入
+        time.sleep(3) 
 
-        # 建議：先 print(page_content) 觀察實際 HTML，確認預估時間的 class 名稱與結構
-        # print(page_content)  # 取消註解這行，執行一次，觀察 HTML
+        html = driver_instance.page_source
+        soup = BeautifulSoup(html, "html.parser")
 
-        # 若 class 名稱或結構有變，請根據實際 HTML 修改正則表達式
-        pattern = re.compile(
-            r'<li>.*?<span class="auto-list-stationlist-position.*?">(.*?)</span>\s*'
-            r'<span class="auto-list-stationlist-number">\s*(\d+)</span>\s*'
-            r'<span class="auto-list-stationlist-place">(.*?)</span>.*?'
-            r'<span class="auto-list-stationlist-estimate.*?">(.*?)</span>',
-            re.DOTALL
-        )
-        matches = pattern.findall(page_content)
-        # 若 matches 為空，代表正則沒抓到，請根據 print 出來的 HTML 修改 pattern
-        if not matches:
-            print("⚠️ 正則表達式未匹配到任何預估到站時間，請檢查 HTML 結構或 class 名稱。")
-        for m in matches:
-            stop_name = m[2].strip()
-            est_time = m[3].strip()
-            if not est_time or est_time == "--":
-                est_time = "無預估"
-            estimated_times[stop_name] = est_time
+        # 根據您提供的 HTML 結構，尋找所有 id 以 'block_' 開頭的 div
+        blocks = soup.select("div[id^='block_']")
+
+        if not blocks:
+            print("⚠️ 未找到任何預估到站時間的區塊 (div[id^='block_'])，請檢查 HTML 結構。")
+
+        for block in blocks:
+            stop_name = block.get("data-stop", "").strip() # 站牌名稱在 data-stop 屬性中
+            eta_tag = block.find("span", class_="eta_onroad") # 到站時間在 class 為 eta_onroad 的 span 中
+            eta_time = eta_tag.text.strip() if eta_tag else "無資料"
+            if stop_name:
+                estimated_times[stop_name] = eta_time
+
     except Exception as e:
         print(f"[錯誤] 獲取預估到站時間失敗：{e}")
+    print(f"預估到站時間獲取完成。共 {len(estimated_times)} 個站點的資料。")
     return estimated_times
 
 if __name__ == "__main__":
@@ -185,15 +181,15 @@ if __name__ == "__main__":
 
     print("正在啟動 Chrome WebDriver...")
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--headless=new") # 使用新的 headless 模式
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--blink-settings=imagesEnabled=false")
+    chrome_options.add_argument("--blink-settings=imagesEnabled=false") # 禁用圖片載入以加速
     chrome_options.page_load_strategy = 'normal'
-    chrome_options.add_argument("--enable-unsafe-swiftshader")
-    chrome_options.add_argument("--log-level=OFF")
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    chrome_options.add_argument("--enable-unsafe-swiftshader") # 嘗試啟用軟體 GPU 渲染
+    chrome_options.add_argument("--log-level=OFF") # 關閉 WebDriver 日誌
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging']) # 排除某些內建日誌
 
     driver = None
     try:
@@ -209,7 +205,7 @@ if __name__ == "__main__":
         wait_initial.until(EC.presence_of_element_located((By.CSS_SELECTOR, "a[data-toggle='collapse'][href*='#collapse']")))
         time.sleep(2)
 
-        for i in range(1, 23):
+        for i in range(1, 23): # 根據觀察，collapse1 到 collapse22 涵蓋了大部分路線
             try:
                 collapse_link_selector = f"a[href='#collapse{i}']"
                 collapse_link = driver.find_element(By.CSS_SELECTOR, collapse_link_selector)
@@ -251,7 +247,7 @@ if __name__ == "__main__":
         print("\n--- 可查詢的公車路線列表 ---")
         display_count = 20
         if len(all_bus_routes_data) > 2 * display_count:
-            print("部分路線列表 (共 {len(all_bus_routes_data)} 條):")
+            print(f"部分路線列表 (共 {len(all_bus_routes_data)} 條):")
             for i in range(display_count):
                 print(f"- {all_bus_routes_data[i]['name']}")
             print("...")
@@ -286,28 +282,31 @@ if __name__ == "__main__":
             continue
 
         try:
+            # 步驟 1: 獲取站牌名稱和經緯度
             stops_with_coords = get_bus_route_stops_from_ebus(selected_route["route_id"], selected_route["name"], driver)
 
             if not stops_with_coords:
                 print(f"無法獲取路線 '{selected_route['name']}' 的站牌數據，無法繪製地圖。")
                 continue
 
+            # 詢問是否輸出 CSV
             export_choice = input(f"是否要將路線 '{selected_route['name']}' 的站牌數據輸出為 CSV 檔案？(y/n): ").strip().lower()
             if export_choice == 'y':
                 export_stops_to_csv(selected_route["name"], stops_with_coords)
 
+            # 步驟 2: 獲取真實預估到站時間
+            estimated_times_data = get_estimated_times_from_ebus(selected_route["route_id"], driver)
+            
+            # 模擬公車當前位置 (這部分邏輯保持不變，因為實時位置數據可能需要不同的 API)
+            bus_location_data = None
             if stops_with_coords:
                 random_stop = random.choice(stops_with_coords)
                 bus_location_data = {
                     "lat": random_stop["lat"] + random.uniform(-0.001, 0.001),
                     "lon": random_stop["lon"] + random.uniform(-0.001, 0.001)
                 }
-            else:
-                bus_location_data = None
-
-            # 取得真實預估到站時間
-            estimated_times_data = get_estimated_times_from_ebus(selected_route["route_id"], driver)
-
+            
+            # 步驟 3: 顯示地圖，包含站牌、公車位置和預估到站時間
             display_bus_route_on_map(selected_route["name"], stops_with_coords, bus_location_data, estimated_times_data)
 
             time.sleep(2)
