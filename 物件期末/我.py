@@ -233,6 +233,7 @@ def display_bus_route_on_map(route_name, stops_data):
                 font-size:14px; padding: 10px">
     <b>圖例說明</b><br>
     🔴 進站中/即將到站<br>
+    🔵 其他站點<br>
     🟢 去程路線<br>
     🟣 返程路線
     </div>
